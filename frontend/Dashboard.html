@@ -370,8 +370,20 @@
 
         .status-mini-placeholder {
             visibility: hidden;
-            min-height: 52px;
+            min-height: 90px;
             pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .status-mini-placeholder {
+                min-height: 140px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .status-mini-placeholder {
+                min-height: 220px;
+            }
         }
 
         .rolling-number {

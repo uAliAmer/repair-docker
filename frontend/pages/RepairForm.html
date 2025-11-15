@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <title>إضافة طلب صيانة جديد</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+/* ============================================
+   LIQUID GLASS DESIGN SYSTEM
+   Apple-Inspired Glassmorphism Aesthetic
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Apple-Inspired Color Palette */
+    --color-primary: #007AFF;
+    --color-primary-light: #5AC8FA;
+    --color-primary-dark: #0051D5;
+    --color-accent: #5E5CE6;
+    --color-accent-dark: #4644CC;
+    --color-accent-light: #BF5AF2;
+    --color-success: #34C759;
+    --color-warning: #FF9500;
+    --color-error: #FF3B30;
+    --color-info: #5AC8FA;
+
+    /* Neutral Glass Tones */
+    --color-bg: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+    --color-surface: rgba(255, 255, 255, 0.7);
+    --color-surface-elevated: rgba(255, 255, 255, 0.85);
+    --color-glass: rgba(255, 255, 255, 0.25);
+    --color-glass-hover: rgba(255, 255, 255, 0.35);
+    --color-border: rgba(0, 0, 0, 0.08);
+    --color-border-light: rgba(255, 255, 255, 0.18);
+    --color-text: #1D1D1F;
+    --color-text-secondary: #6E6E73;
+    --color-text-tertiary: #8E8E93;
+    --color-text-light: #6E6E73;
+    --color-text-inverse: #ffffff;
+
+    /* Spacing - Generous Apple-style */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-xxl: 48px;
+
+    /* Glass Shadows - Soft & Layered */
+    --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+
+    /* Border Radius - Rounded Apple Style */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+    --border-radius: 12px;
+
+    /* Typography - SF Pro-like */
+    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', sans-serif;
+    --font-family-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    --font-mono: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    --font-size-base: 15px;
+    --font-size-sm: 13px;
+    --font-size-lg: 17px;
+    --font-size-xl: 22px;
+    --font-size-xxl: 28px;
+
+    /* Transitions - Smooth & Fluid */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Blur Effects */
+    --blur-sm: 10px;
+    --blur-md: 20px;
+    --blur-lg: 40px;
+}
+
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    background: var(--color-bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    padding: var(--space-xl);
+    background: var(--color-surface-elevated);
+    backdrop-filter: blur(var(--blur-md));
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-glass);
+    border: 1px solid var(--color-border-light);
+}
+
+.page-header h1 {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-xxl);
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.page-header p {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-base);
+}
+
+.card {
+    background: var(--color-surface-elevated);
+    backdrop-filter: blur(var(--blur-md));
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    box-shadow: var(--shadow-glass);
+    border: 1px solid var(--color-border-light);
+    margin-bottom: var(--space-lg);
+}
+
+/* QR Scanner Section */
+.qr-scanner-section {
+    margin-bottom: var(--space-xl);
+}
+
+.qr-scanner-card {
+    background: linear-gradient(135deg, rgba(0, 122, 255, 0.1) 0%, rgba(94, 92, 230, 0.1) 100%);
+    border: 2px dashed var(--color-primary);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    text-align: center;
+}
+
+.qr-scanner-card.scanned {
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.1) 0%, rgba(90, 200, 250, 0.1) 100%);
+    border-color: var(--color-success);
+}
+
+.qr-scanner-card h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-md);
+    color: var(--color-primary);
+}
+
+.qr-scanner-card.scanned h3 {
+    color: var(--color-success);
+}
+
+#reader {
+    max-width: 500px;
+    margin: 0 auto var(--space-md);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.scanned-id-display {
+    background: var(--color-surface-elevated);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    margin-top: var(--space-md);
+}
+
+.scanned-id-display h4 {
+    color: var(--color-success);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--space-sm);
+}
+
+.scanned-id-display .repair-id {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--color-primary);
+    background: rgba(0, 122, 255, 0.1);
+    padding: var(--space-md);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    margin-bottom: var(--space-sm);
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+    width: 100%;
+    padding: var(--space-md);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+    outline: none;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+    border-color: var(--color-primary);
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.form-input:disabled,
+.form-textarea:disabled,
+.form-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(200, 200, 200, 0.3);
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=UTF-8,<svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 1L6 6L11 1" stroke="%231D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+    background-repeat: no-repeat;
+    background-position: left var(--space-md) center;
+    padding-left: var(--space-xl);
+}
+
+/* Image Upload Section */
+.image-upload-card {
+    background: linear-gradient(135deg, rgba(94, 92, 230, 0.05) 0%, rgba(191, 90, 242, 0.05) 100%);
+    border: 2px dashed var(--color-accent);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.image-upload-card h3 {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+    color: var(--color-accent);
+}
+
+.text-muted {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.mb-md {
+    margin-bottom: var(--space-md);
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.upload-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+}
+
+.upload-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+#imagePreview {
+    display: none;
+    max-width: 100%;
+    max-height: 400px;
+    margin-top: var(--space-md);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+
+.image-info {
+    margin-top: var(--space-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.remove-image-btn {
+    display: none;
+    margin-top: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-error);
+    color: white;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.remove-image-btn:hover {
+    background: #d32f2f;
+}
+
+/* Buttons */
+.btn {
+    padding: var(--space-md) var(--space-xl);
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    border: none;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-sm);
+    width: 100%;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-dark) 100%);
+    margin-top: var(--space-md);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--color-success) 0%, #2d9c4e 100%);
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Success Display */
+#successDisplay {
+    display: none;
+    text-align: center;
+}
+
+.success-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-lg);
+    animation: scaleIn 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-message {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--color-success);
+    margin-bottom: var(--space-lg);
+}
+
+.success-repair-id {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-xxl);
+    font-weight: 700;
+    color: var(--color-primary);
+    background: rgba(0, 122, 255, 0.1);
+    padding: var(--space-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-xl);
+    display: inline-block;
+}
+
+.success-status {
+    font-size: var(--font-size-lg);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-xl);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-container {
+        padding: var(--space-md);
+    }
+
+    .page-header {
+        padding: var(--space-lg);
+    }
+
+    .page-header h1 {
+        font-size: var(--font-size-xl);
+    }
+
+    .card {
+        padding: var(--space-lg);
+    }
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #successDisplay, #successDisplay * {
+        visibility: visible;
+    }
+    #successDisplay {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    .btn {
+        display: none;
+    }
+}
+    </style>
+  </head>
+  <body>
+    <div class="app-container">
+      <div class="page-header">
+        <h1>🛠️ إضافة طلب صيانة جديد</h1>
+        <p>امسح رمز QR أولاً، ثم املأ التفاصيل</p>
+      </div>
+
+      <!-- QR Scanner Section -->
+      <div class="qr-scanner-section" id="qrScannerSection">
+        <div class="qr-scanner-card" id="qrScannerCard">
+          <h3 id="scannerTitle">📷 امسح رمز QR المطبوع مسبقاً</h3>
+          <p class="text-muted mb-md">استخدم كاميرا الجهاز لمسح رمز QR الموجود على الملصق</p>
+          <div id="reader"></div>
+          <button type="button" class="btn btn-secondary" id="startScanBtn" onclick="startScanning()">
+            📸 بدء المسح
+          </button>
+          <div id="scannedIdDisplay" class="scanned-id-display" style="display: none;">
+            <h4>✅ تم مسح رقم الطلب بنجاح</h4>
+            <div class="repair-id" id="scannedRepairId"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Repair Form -->
+      <div class="card" id="formCard">
+        <form id="repairForm" onsubmit="handleSubmit(event)">
+          <div class="form-group">
+            <label class="form-label">📅 التاريخ</label>
+            <input name="date" type="date" required id="date" class="form-input" disabled>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">👤 اسم العميل</label>
+            <textarea name="customer" placeholder="أدخل اسم العميل..." required class="form-textarea" disabled></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">📱 هاتف العميل <img width="18" height="18" src="https://img.icons8.com/color/48/whatsapp--v6.png" alt="whatsapp" style="vertical-align: middle; margin-left: 4px;"/></label>
+            <input name="phone" type="tel" placeholder="07745557861" required class="form-input" disabled>
+            <small style="display: block; margin-top: 4px; color: var(--color-text-secondary); font-size: var(--font-size-sm);">* يجب ان يحتوي الرقم على واتساب</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">📦 الجهاز</label>
+            <textarea name="device" placeholder="مثال: GSTAR 4 Gang Gold، Sonoff Basic" required class="form-textarea" disabled></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">❗ المشكلة / العطل</label>
+            <textarea name="issue" placeholder="اوصف المشكلة هنا..." class="form-textarea" style="min-height: 120px;" disabled></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">🏢 الفرع</label>
+            <select name="branch" required class="form-select" dir="rtl" disabled>
+              <option value="">اختر الفرع</option>
+              <option>عكد النصارى</option>
+              <option>بابلون مول</option>
+              <option>كمب سارة</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">🛡️ الضمان</label>
+            <select name="warranty" required class="form-select" disabled>
+              <option value="">اختر حالة الضمان</option>
+              <option>نعم</option>
+              <option>لا</option>
+            </select>
+          </div>
+
+          <!-- Image Upload Section -->
+          <div class="image-upload-card">
+            <h3>📸 صورة الجهاز</h3>
+            <p class="text-muted mb-md">التقط صورة لتوثيق حالة الجهاز</p>
+
+            <input type="file" id="deviceImage" accept="image/*" capture="camera" disabled>
+            <label for="deviceImage" class="upload-button" id="uploadButtonLabel" style="opacity: 0.5; cursor: not-allowed;">
+              <span>📷</span>
+              <span>التقط/ارفع صورة</span>
+            </label>
+
+            <div class="image-info" id="imageInfo"></div>
+            <img id="imagePreview" alt="معاينة الجهاز">
+            <button type="button" class="remove-image-btn" id="removeImageBtn">✕ إزالة الصورة</button>
+          </div>
+
+          <button type="submit" class="btn" id="submitBtn" disabled>
+            ➕ إضافة طلب صيانة
+          </button>
+        </form>
+      </div>
+
+      <!-- Success Display -->
+      <div class="card" id="successDisplay">
+        <div class="success-icon">✅</div>
+        <div class="success-message">تم إنشاء الطلب بنجاح!</div>
+        <div class="success-repair-id" id="successRepairId"></div>
+        <div class="success-status" id="successStatus"></div>
+        <button type="button" class="btn btn-success" onclick="startNewRepair()">
+          ✨ إضافة طلب جديد
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+      // Global variables
+      let uploadedImageData = null;
+      let scannedRepairId = null;
+      let html5QrCode = null;
+
+      // Set default date to today
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+
+      // Beep sound function for QR scan success
+      function playBeep() {
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          // High-pitched beep at 1200Hz
+          oscillator.frequency.value = 1200;
+          oscillator.type = 'sine';
+
+          // Loud volume
+          gainNode.gain.value = 0.8;
+
+          // Play beep for 200ms
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.2);
+
+          // Cleanup
+          setTimeout(() => {
+            oscillator.disconnect();
+            gainNode.disconnect();
+            audioContext.close();
+          }, 300);
+        } catch (error) {
+          console.error('Failed to play beep:', error);
+        }
+      }
+
+      // Auto-start scanning when page loads
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+          startScanning();
+        }, 500);
+      });
+
+      // Start QR scanning
+      function startScanning() {
+        const readerElement = document.getElementById('reader');
+
+        if (html5QrCode) {
+          // Scanner already initialized, just start
+          html5QrCode.start(
+            { facingMode: "environment" },
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 }
+            },
+            onScanSuccess,
+            onScanFailure
+          ).catch(err => {
+            console.error('Error starting scanner:', err);
+            alert('خطأ في تشغيل الكاميرا: ' + err);
+          });
+        } else {
+          // Initialize scanner
+          html5QrCode = new Html5Qrcode("reader");
+          html5QrCode.start(
+            { facingMode: "environment" },
+            {
+              fps: 10,
+              qrbox: { width: 250, height: 250 }
+            },
+            onScanSuccess,
+            onScanFailure
+          ).catch(err => {
+            console.error('Error initializing scanner:', err);
+            alert('خطأ في تشغيل الكاميرا: ' + err);
+          });
+        }
+
+        document.getElementById('startScanBtn').textContent = '🔄 جارٍ المسح...';
+        document.getElementById('startScanBtn').disabled = true;
+      }
+
+      // QR scan success handler
+      function onScanSuccess(decodedText, decodedResult) {
+        // Play beep sound
+        playBeep();
+
+        // Stop scanning
+        if (html5QrCode) {
+          html5QrCode.stop().then(() => {
+            console.log('Scanner stopped');
+          }).catch(err => {
+            console.error('Error stopping scanner:', err);
+          });
+        }
+
+        // Store the scanned repair ID
+        const repairId = decodedText.trim();
+
+        // Show loading overlay while checking
+        document.getElementById('loadingOverlay').style.display = 'flex';
+
+        // Check if repair ID already exists in system
+        google.script.run
+          .withSuccessHandler(function(existingRepair) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+
+            if (existingRepair && existingRepair.repairId) {
+              // Repair ID already exists - show error
+              alert('❌ خطأ: رمز QR هذا موجود بالفعل في النظام!\n\n' +
+                    'رقم الطلب: ' + existingRepair.repairId + '\n' +
+                    'العميل: ' + existingRepair.customer + '\n' +
+                    'الحالة: ' + existingRepair.repairStatus + '\n\n' +
+                    'يرجى استخدام رمز QR جديد لإنشاء طلب جديد.');
+
+              // Reset scanner UI
+              document.getElementById('startScanBtn').style.display = 'inline-block';
+              document.getElementById('startScanBtn').disabled = false;
+              document.getElementById('startScanBtn').textContent = '📸 بدء المسح';
+
+              return;
+            }
+
+            // Repair ID doesn't exist - proceed with form
+            scannedRepairId = repairId;
+
+            // Update UI to show scanned ID
+            document.getElementById('scannedRepairId').textContent = scannedRepairId;
+            document.getElementById('scannedIdDisplay').style.display = 'block';
+            document.getElementById('qrScannerCard').classList.add('scanned');
+            document.getElementById('scannerTitle').textContent = '✅ تم المسح بنجاح';
+            document.getElementById('startScanBtn').style.display = 'none';
+
+            // Enable all form fields
+            enableFormFields();
+
+            // Scroll to form
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          })
+          .withFailureHandler(function(error) {
+            document.getElementById('loadingOverlay').style.display = 'none';
+
+            // If error is "not found", that's good - it means ID doesn't exist
+            console.log('Check result:', error);
+
+            // Proceed with form since ID doesn't exist
+            scannedRepairId = repairId;
+
+            // Update UI to show scanned ID
+            document.getElementById('scannedRepairId').textContent = scannedRepairId;
+            document.getElementById('scannedIdDisplay').style.display = 'block';
+            document.getElementById('qrScannerCard').classList.add('scanned');
+            document.getElementById('scannerTitle').textContent = '✅ تم المسح بنجاح';
+            document.getElementById('startScanBtn').style.display = 'none';
+
+            // Enable all form fields
+            enableFormFields();
+
+            // Scroll to form
+            document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+          })
+          .searchByQRCode(repairId);
+      }
+
+      // QR scan failure handler (optional)
+      function onScanFailure(error) {
+        // Handle scan failure silently (too many logs)
+        // console.warn(`QR scan error: ${error}`);
+      }
+
+      // Enable form fields after QR scan
+      function enableFormFields() {
+        const formInputs = document.querySelectorAll('#repairForm input, #repairForm textarea, #repairForm select');
+        formInputs.forEach(input => {
+          input.disabled = false;
+        });
+
+        document.getElementById('deviceImage').disabled = false;
+        document.getElementById('uploadButtonLabel').style.opacity = '1';
+        document.getElementById('uploadButtonLabel').style.cursor = 'pointer';
+        document.getElementById('submitBtn').disabled = false;
+      }
+
+      // Handle image upload
+      document.getElementById('deviceImage').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = function(event) {
+            // Compress and store image
+            compressImage(event.target.result, function(compressedData) {
+              uploadedImageData = compressedData;
+
+              const preview = document.getElementById('imagePreview');
+              preview.src = compressedData;
+              preview.style.display = 'block';
+
+              // Show image info
+              const sizeKB = (compressedData.length * 0.75 / 1024).toFixed(0);
+              document.getElementById('imageInfo').textContent =
+                `حجم الصورة: ${sizeKB} كيلوبايت`;
+
+              document.getElementById('removeImageBtn').style.display = 'inline-block';
+            });
+          };
+
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Remove image
+      document.getElementById('removeImageBtn').addEventListener('click', function() {
+        uploadedImageData = null;
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('imageInfo').textContent = '';
+        document.getElementById('removeImageBtn').style.display = 'none';
+        document.getElementById('deviceImage').value = '';
+      });
+
+      // Compress image to reduce size
+      function compressImage(dataUrl, callback) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Resize if too large
+          const maxSize = 1200;
+          if (width > maxSize || height > maxSize) {
+            if (width > height) {
+              height = (height / width) * maxSize;
+              width = maxSize;
+            } else {
+              width = (width / height) * maxSize;
+              height = maxSize;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convert to JPEG with compression
+          const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+          callback(compressedData);
+        };
+        img.src = dataUrl;
+      }
+
+      // Handle form submission
+      function handleSubmit(event) {
+        event.preventDefault();
+
+        if (!scannedRepairId) {
+          alert('خطأ: يجب مسح رمز QR أولاً');
+          return;
+        }
+
+        const form = document.getElementById('repairForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جارٍ المعالجة...';
+        document.getElementById('loadingOverlay').style.display = 'flex';
+
+        // Prepare form data
+        const formData = Object.fromEntries(new FormData(form));
+
+        // Add the scanned repair ID
+        formData.repairId = scannedRepairId;
+
+        // Add image data if uploaded
+        if (uploadedImageData) {
+          formData.imageData = uploadedImageData;
+        }
+
+        // Submit to Google Apps Script
+        google.script.run
+          .withSuccessHandler(function(response) {
+            // Hide loading
+            document.getElementById('loadingOverlay').style.display = 'none';
+
+            // Hide scanner and form
+            document.getElementById('qrScannerSection').style.display = 'none';
+            document.getElementById('formCard').style.display = 'none';
+
+            // Show success display
+            document.getElementById('successRepairId').textContent = response.repairId;
+            document.getElementById('successStatus').textContent = 'الحالة: ' + response.status;
+            document.getElementById('successDisplay').style.display = 'block';
+
+            // Scroll to success display
+            document.getElementById('successDisplay').scrollIntoView({ behavior: 'smooth' });
+          })
+          .withFailureHandler(function(error) {
+            // Hide loading
+            document.getElementById('loadingOverlay').style.display = 'none';
+
+            // Show error
+            alert('خطأ: فشل في إنشاء طلب - ' + error.message);
+
+            // Re-enable button
+            submitBtn.disabled = false;
+            submitBtn.textContent = '➕ إضافة طلب صيانة';
+          })
+          .submitForm(formData);
+      }
+
+      // Start new repair
+      function startNewRepair() {
+        // Reset everything
+        scannedRepairId = null;
+        uploadedImageData = null;
+
+        // Reset form
+        document.getElementById('repairForm').reset();
+        document.getElementById('date').value = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('imagePreview').style.display = 'none';
+        document.getElementById('imageInfo').textContent = '';
+        document.getElementById('removeImageBtn').style.display = 'none';
+
+        // Disable form fields again
+        const formInputs = document.querySelectorAll('#repairForm input, #repairForm textarea, #repairForm select');
+        formInputs.forEach(input => {
+          input.disabled = true;
+        });
+        document.getElementById('deviceImage').disabled = true;
+        document.getElementById('uploadButtonLabel').style.opacity = '0.5';
+        document.getElementById('uploadButtonLabel').style.cursor = 'not-allowed';
+        document.getElementById('submitBtn').disabled = true;
+
+        // Reset scanner UI
+        document.getElementById('scannedIdDisplay').style.display = 'none';
+        document.getElementById('qrScannerCard').classList.remove('scanned');
+        document.getElementById('scannerTitle').textContent = '📷 امسح رمز QR المطبوع مسبقاً';
+        document.getElementById('startScanBtn').style.display = 'inline-block';
+        document.getElementById('startScanBtn').disabled = false;
+        document.getElementById('startScanBtn').textContent = '📸 بدء المسح';
+
+        // Show scanner and form, hide success
+        document.getElementById('qrScannerSection').style.display = 'block';
+        document.getElementById('formCard').style.display = 'block';
+        document.getElementById('successDisplay').style.display = 'none';
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    </script>
+  </body>
+</html>

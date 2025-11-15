@@ -1,0 +1,141 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=supersecret
+      - N8N_HOST=n8n.nixflow.xyz
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n.nixflow.xyz/
+      - GENERIC_TIMEZONE=Asia/Baghdad
+    ports:
+      - "5678:5678"
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    depends_on:
+      - postgres
+
+  evolution-api:
+    command: sh -c "sleep 5 && node index.js"
+    image: atendai/evolution-api:latest
+    restart: always
+    environment:
+      # Server Configuration
+      - SERVER_TYPE=http
+      - SERVER_PORT=8080
+      - SERVER_URL=https://evolution.nixflow.xyz
+      - CONFIG_SESSION_PHONE_VERSION=2.3000.1025062854
+
+      # Database Configuration
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://evolution:evolutionsecret@postgres:5432/evolution
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution_api
+      - DATABASE_SAVE_DATA_INSTANCE=true
+      - DATABASE_SAVE_DATA_NEW_MESSAGE=true
+      - DATABASE_SAVE_MESSAGE_UPDATE=true
+      - DATABASE_SAVE_DATA_CONTACTS=true
+      - DATABASE_SAVE_DATA_CHATS=true
+
+      # Authentication
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=GvhpMxOWF4a4cr11gsT1chf1NQ7HT5Ur
+      - AUTHENTICATION_EXPOSE_IN_FETCH_INSTANCES=true
+
+      # Instance Configuration
+      - CONFIG_SESSION_PHONE_CLIENT=Evolution API
+      - CONFIG_SESSION_PHONE_NAME=Chrome
+
+      # QR Code
+      - QRCODE_LIMIT=30
+      - QRCODE_COLOR=#198754
+
+      # Timezone
+      - TZ=Asia/Baghdad
+
+      # Webhook
+      - WEBHOOK_GLOBAL_ENABLED=false
+      - WEBHOOK_GLOBAL_URL=
+      - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=false
+
+      # Logging
+      - LOG_LEVEL=ERROR
+      - LOG_COLOR=true
+      - LOG_BAILEYS=error
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://redis:6379/6
+      - CACHE_REDIS_TTL=604800
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./evolution_data:/evolution/instances
+      - ./evolution_store:/evolution/store
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - default
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=supersecret
+      - POSTGRES_DB=n8n
+      # Create multiple databases on init
+      - POSTGRES_MULTIPLE_DATABASES=n8n,evolution
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres_init:/docker-entrypoint-initdb.d
+    networks:
+      - default
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/certbot:/var/www/certbot
+      - ./nginx/ssl:/etc/letsencrypt
+      - ./nginx/html:/usr/share/nginx/html
+    depends_on:
+      - n8n
+      - evolution-api
+    networks:
+      - default
+
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+
+
+  certbot:
+    image: certbot/certbot
+    entrypoint: /bin/sh -c
+    command: >
+      "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h; done"
+    volumes:
+      - ./nginx/certbot:/var/www/certbot
+      - ./nginx/ssl:/etc/letsencrypt
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge

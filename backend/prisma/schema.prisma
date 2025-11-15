@@ -1,0 +1,152 @@
+// Prisma Schema for Repair Tracker System
+// PostgreSQL Database
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Model - Replaces Google Apps Script Users
+model User {
+  id            String    @id @default(uuid())
+  username      String    @unique
+  passwordHash  String
+  role          UserRole  @default(USER)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLogin     DateTime?
+  loginAttempts Int       @default(0)
+  lockedUntil   DateTime?
+
+  // Relations
+  createdRepairs   Repair[]        @relation("CreatedByUser")
+  historyEntries   RepairHistory[] @relation("HistoryUser")
+  notes            Note[]          @relation("NoteUser")
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  TECH      // Repair center technician
+  USER      // Branch user
+  VIEWER    // Read-only access
+}
+
+// Repair Model - Main repair tracking
+model Repair {
+  id              String        @id @default(uuid())
+  repairId        String        @unique // RPR251112-123 format
+
+  // Customer Information
+  customerName    String
+  phone           String
+  device          String
+  issue           String
+
+  // Branch & Status
+  branch          String
+  status          RepairStatus  @default(RECEIVED_AQD)
+
+  // Dates
+  receivedDate    DateTime      @default(now())
+  returnDate      DateTime?
+
+  // Financial
+  estimatedCost   Decimal?      @db.Decimal(10, 2)
+  warranty        Boolean       @default(false)
+  costCenter      String?
+
+  // Media
+  imageUrl        String?
+  qrCodeUrl       String?
+
+  // Tracking
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  createdById     String
+
+  // Relations
+  createdBy       User            @relation("CreatedByUser", fields: [createdById], references: [id])
+  history         RepairHistory[]
+  notes           Note[]
+
+  @@index([repairId])
+  @@index([status])
+  @@index([branch])
+  @@index([receivedDate])
+  @@index([phone])
+  @@map("repairs")
+}
+
+enum RepairStatus {
+  // Branch Reception
+  RECEIVED_AQD         // تم استلام في عكد النصارى
+  RECEIVED_BABYLON     // تم استلام في بابلون مول
+  RECEIVED_CAMP        // تم استلام في كمب سارة
+
+  // Repair Center
+  RECEIVED_CENTER      // تم استلام في مركز الصيانة
+  IN_REPAIR            // قيد الصيانة حاليا
+  REPAIR_COMPLETE      // مكتمل الصيانة
+  UNREPAIRABLE         // غير قابل للصيانة
+
+  // Return Process
+  READY_FOR_PICKUP     // جاهز للاستلام
+  DELIVERED_TO_CUSTOMER // تم استلام من قبل الزبون
+}
+
+// Repair History - Activity log for each repair
+model RepairHistory {
+  id        String   @id @default(uuid())
+  repairId  String
+  action    String   // Status change or activity description
+  userId    String?
+  userName  String   // Store name for display
+  notes     String?
+  timestamp DateTime @default(now())
+
+  // Relations
+  repair    Repair   @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  user      User?    @relation("HistoryUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([repairId])
+  @@index([timestamp])
+  @@map("repair_history")
+}
+
+// Customer Notes - Timestamped notes for repairs
+model Note {
+  id        String   @id @default(uuid())
+  repairId  String
+  noteText  String   @db.Text
+  userId    String?
+  userName  String
+  createdAt DateTime @default(now())
+
+  // Relations
+  repair    Repair   @relation(fields: [repairId], references: [id], onDelete: Cascade)
+  user      User?    @relation("NoteUser", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([repairId])
+  @@index([createdAt])
+  @@map("notes")
+}
+
+// Session Model - For JWT token blacklist (optional but recommended)
+model Session {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}

@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repair Tracking System</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        /* ============================================================
+           LIQUID GLASS DESIGN SYSTEM
+           Apple-Inspired Glassmorphism Aesthetic
+           ============================================================ */
+
+        /* CSS Variables - Core Design Tokens */
+        :root {
+            /* Apple-Inspired Color Palette */
+            --color-primary: #007AFF;
+            --color-primary-light: #5AC8FA;
+            --color-primary-dark: #0051D5;
+            --color-accent: #5E5CE6;
+            --color-accent-light: #BF5AF2;
+            --color-success: #34C759;
+            --color-warning: #FF9500;
+            --color-error: #FF3B30;
+            --color-info: #5AC8FA;
+
+            /* Neutral Glass Tones */
+            --color-background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            --color-surface: rgba(255, 255, 255, 0.7);
+            --color-surface-elevated: rgba(255, 255, 255, 0.85);
+            --color-glass: rgba(255, 255, 255, 0.25);
+            --color-glass-hover: rgba(255, 255, 255, 0.35);
+            --color-border: rgba(0, 0, 0, 0.08);
+            --color-border-light: rgba(255, 255, 255, 0.18);
+            --color-text: #1D1D1F;
+            --color-text-secondary: #6E6E73;
+            --color-text-tertiary: #8E8E93;
+
+            /* Typography - SF Pro-like */
+            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', sans-serif;
+            --font-family-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            --font-size-base: 15px;
+            --font-size-sm: 13px;
+            --font-size-lg: 17px;
+            --font-size-xl: 22px;
+            --font-size-xxl: 28px;
+
+            /* Spacing - Generous Apple-style */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+
+            /* Glass Shadows - Soft & Layered */
+            --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+
+            /* Border Radius - Rounded Apple Style */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+
+            /* Transitions - Smooth & Fluid */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Blur Effects */
+            --blur-sm: 10px;
+            --blur-md: 20px;
+            --blur-lg: 40px;
+        }
+
+        /* ============================================================
+           BASE STYLES & FULL HEIGHT LAYOUT
+           ============================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Full viewport height - with mobile fallback */
+        html {
+            height: 100%;
+            /* Fallback for older browsers */
+            height: 100vh;
+            /* Modern browsers with dynamic viewport */
+            height: 100dvh;
+        }
+
+        body {
+            height: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 50%, #dfe4ea 100%);
+            background-attachment: fixed;
+            color: var(--color-text);
+            overflow: hidden;
+            position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Animated background gradient overlay for depth */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(94, 92, 230, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(0, 122, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================================
+           NAVIGATION BAR - RESPONSIVE HAMBURGER MENU
+           ============================================================ */
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            position: relative;
+            min-height: 64px;
+            max-height: 64px;
+            flex-shrink: 0;
+            z-index: 1002;
+        }
+
+        .brand {
+            color: var(--color-text);
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            font-family: var(--font-family-display);
+            padding: var(--space-md) var(--space-xl);
+            white-space: nowrap;
+            flex-shrink: 0;
+            letter-spacing: -0.5px;
+        }
+
+        /* Hamburger Button - Hidden on Desktop */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 44px;
+            height: 44px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            position: absolute;
+            right: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1002;
+            /* Touch optimizations */
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hamburger-line {
+            width: 24px;
+            height: 3px;
+            background: var(--color-text);
+            border-radius: 2px;
+            transition: all var(--transition-base);
+            transform-origin: center;
+        }
+
+        /* Hamburger Animation when Active */
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: translateY(7px) rotate(45deg);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: translateY(-7px) rotate(-45deg);
+        }
+
+        /* Desktop Navigation Links */
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex: 1;
+        }
+
+        .nav-links li {
+            margin: 0;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            padding: var(--space-sm) var(--space-lg);
+            margin: 0 var(--space-xs);
+            transition: all var(--transition-base);
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            min-height: 44px;
+            position: relative;
+            border-radius: var(--radius-md);
+        }
+
+        .nav-links a:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--color-text);
+        }
+
+        /* Active Page - Glass pill with glow */
+        .nav-links a.active {
+            background: rgba(0, 122, 255, 0.12);
+            color: var(--color-primary);
+            font-weight: 600;
+            box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.2),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        .nav-actions {
+            padding: 0 var(--space-lg);
+            display: flex;
+            align-items: center;
+        }
+
+        .btn-logout {
+            padding: var(--space-xs) var(--space-md);
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--color-text-secondary);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: var(--radius-full);
+            font-family: var(--font-family);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .btn-logout:hover {
+            background: rgba(0, 0, 0, 0.08);
+            color: var(--color-text);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-logout:active {
+            transform: scale(0.96);
+            box-shadow: none;
+        }
+
+        /* ============================================================
+           APPLICATION SCREEN LAYOUT
+           ============================================================ */
+
+        #appScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ============================================================
+           CONTENT AREA
+           ============================================================ */
+
+        .content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: white;
+            /* Ensure content fills remaining space after navbar */
+            min-height: 0;
+        }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* ============================================================
+           LOGIN CONTAINER
+           ============================================================ */
+
+        .login-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--color-background);
+            padding: var(--space-lg);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        #loginScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: saturate(180%) blur(30px);
+            -webkit-backdrop-filter: saturate(180%) blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-glass);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(94, 92, 230, 0.06) 100%);
+            backdrop-filter: blur(10px);
+            color: var(--color-text);
+            padding: var(--space-xxl) var(--space-xl);
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .login-header h1 {
+            font-size: var(--font-size-xxl);
+            font-weight: 600;
+            font-family: var(--font-family-display);
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .login-body {
+            padding: var(--space-xl);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1),
+                        0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.35),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--color-error);
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            font-size: var(--font-size-sm);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .login-footer {
+            background: rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding: var(--space-lg);
+            text-align: center;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        /* ============================================================
+           PAGE TRANSITION LOADER
+           ============================================================ */
+
+        .page-loader {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 247, 250, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-base);
+        }
+
+        .page-loader.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Spinner Container */
+        .loader-spinner {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: var(--space-lg);
+        }
+
+        /* Outer Ring - Rotating */
+        .spinner-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid rgba(0, 122, 255, 0.1);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* Inner Ring - Counter-rotating */
+        .spinner-ring-inner {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: calc(100% - 16px);
+            height: calc(100% - 16px);
+            border: 2px solid transparent;
+            border-bottom-color: var(--color-accent);
+            border-radius: 50%;
+            animation: spin-reverse 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+
+        /* Center Dot - Pulsing */
+        .spinner-dot {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 12px;
+            height: 12px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 1.5s ease-in-out infinite;
+            box-shadow: 0 0 12px rgba(0, 122, 255, 0.4);
+        }
+
+        /* Loading Text */
+        .loader-text {
+            color: var(--color-primary);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            text-align: center;
+            animation: fade-pulse 2s ease-in-out infinite;
+        }
+
+        /* Progress Bar */
+        .loader-progress {
+            width: 200px;
+            height: 4px;
+            background: var(--color-border);
+            border-radius: 2px;
+            margin-top: var(--space-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-inset);
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg,
+                var(--color-accent) 0%,
+                var(--color-primary) 50%,
+                var(--color-accent) 100%);
+            border-radius: 2px;
+            animation: progress-slide 1.5s ease-in-out infinite;
+            box-shadow: 0 0 8px rgba(22, 160, 133, 0.4);
+        }
+
+        /* Animations */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes spin-reverse {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes fade-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes progress-slide {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(200%);
+            }
+        }
+
+        /* Fast fade-out when loading completes */
+        .page-loader.loaded {
+            opacity: 0;
+            transition: opacity 200ms ease-out;
+        }
+
+        /* ============================================================
+           UTILITY CLASSES
+           ============================================================ */
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ============================================================
+           RTL (RIGHT-TO-LEFT) SUPPORT FOR ARABIC
+           ============================================================ */
+
+        /* RTL Body Direction */
+        body.rtl-mode {
+            direction: rtl;
+        }
+
+        body.ltr-mode {
+            direction: ltr;
+        }
+
+        /* RTL Navigation */
+        [dir="rtl"] .nav-links {
+            margin-right: 0;
+            margin-left: auto;
+        }
+
+        [dir="rtl"] .nav-links li {
+            margin-right: 0;
+            margin-left: var(--space-lg);
+        }
+
+        [dir="rtl"] .nav-actions {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        [dir="rtl"] .nav-actions .btn-logout {
+            margin-left: 0;
+            margin-right: var(--space-sm);
+        }
+
+        [dir="rtl"] #langSwitcher {
+            margin-right: 0 !important;
+            margin-left: 8px !important;
+        }
+
+        /* RTL Login Card */
+        [dir="rtl"] .form-label {
+            text-align: right;
+        }
+
+        [dir="rtl"] .form-input {
+            text-align: right;
+        }
+
+        /* RTL iframe */
+        [dir="rtl"] #appFrame {
+            direction: inherit;
+        }
+
+        /* RTL Hamburger Menu Position */
+        [dir="rtl"] .hamburger {
+            right: auto;
+            left: var(--space-md);
+            transform: translateY(-50%);
+        }
+
+        /* RTL Mobile Navigation */
+        [dir="rtl"] .nav-links.show {
+            right: auto;
+            left: 0;
+        }
+
+        /* Arabic Font Support */
+        body.rtl-mode {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Arial', 'Helvetica Neue',
+                         'Tahoma', 'Traditional Arabic', 'Simplified Arabic', sans-serif;
+        }
+
+        /* ============================================================
+           RESPONSIVE DESIGN - MOBILE FIRST APPROACH
+           ============================================================ */
+
+        /* Device Detection Classes */
+        body.mobile-device {
+            font-size: 16px; /* Prevent iOS zoom on input focus */
+        }
+
+        body.desktop-device {
+            /* Desktop-specific styles */
+        }
+
+        /* ============================================================
+           MOBILE RESPONSIVE STYLES - HAMBURGER MENU
+           ============================================================ */
+
+        /* Mobile Devices - All sizes below 768px */
+        @media (max-width: 767px) {
+            /* Show hamburger button on mobile */
+            .hamburger {
+                display: flex;
+            }
+
+            /* Keep navbar compact - just brand and hamburger */
+            .navbar {
+                flex-wrap: wrap;
+                min-height: 50px;
+                max-height: 50px;
+            }
+
+            .brand {
+                border-right: none;
+                padding: var(--space-sm) var(--space-md);
+                font-size: 1rem;
+                flex: 1;
+            }
+
+            /* Hide nav-links by default - main mobile menu container */
+            .nav-links {
+                position: absolute;
+                top: 50px;
+                left: 0;
+                right: 0;
+                background: rgba(30, 35, 45, 0.97);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                max-height: 0;
+                overflow-y: auto;
+                overflow-x: hidden;
+                opacity: 0;
+                transform: translateY(-10px);
+                transition: all var(--transition-base);
+                z-index: 1001;
+                box-shadow: var(--shadow-lg);
+                flex-direction: column;
+                padding: 0;
+                /* Touch scroll optimizations */
+                -webkit-overflow-scrolling: touch;
+                touch-action: pan-y;
+                overscroll-behavior: contain;
+                scroll-behavior: smooth;
+            }
+
+            /* Show menu when active - increased height to fit all items */
+            .nav-links.active {
+                max-height: calc(100vh - 50px);
+                max-height: calc(100dvh - 50px);
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Position nav-actions below nav-links on mobile */
+            .nav-actions {
+                position: absolute;
+                /* Position after navbar (50px) + nav items (4 × 48px = 192px) + spacing (8px) */
+                top: 250px;
+                left: 0;
+                right: 0;
+                background: rgba(30, 35, 45, 0.97);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                padding: 0;
+                margin: 0;
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transform: translateY(-10px);
+                transition: all var(--transition-base) 0.1s;
+                z-index: 1001;
+                box-shadow: var(--shadow-lg);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                /* Touch scroll optimizations */
+                touch-action: pan-y;
+                overscroll-behavior: contain;
+            }
+
+            /* Show nav-actions when menu is active */
+            .nav-actions.active {
+                max-height: 80px;
+                opacity: 1;
+                transform: translateY(0);
+                padding: var(--space-md);
+            }
+
+            .nav-links a {
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                padding: var(--space-md) var(--space-lg);
+                min-height: 48px;
+                font-size: var(--font-size-base);
+                justify-content: flex-start;
+                position: relative;
+                color: rgba(255, 255, 255, 0.9);
+                /* Touch optimizations */
+                touch-action: manipulation;
+                -webkit-tap-highlight-color: rgba(0, 122, 255, 0.2);
+                user-select: none;
+            }
+
+            /* Enhanced mobile active state with left accent */
+            .nav-links a.active {
+                background: rgba(0, 122, 255, 0.15);
+                border-left: 4px solid rgba(0, 122, 255, 0.8);
+                border-bottom-color: rgba(255, 255, 255, 0.15);
+                box-shadow: inset 4px 0 8px rgba(0, 122, 255, 0.2);
+                color: rgba(255, 255, 255, 1);
+            }
+
+            /* Mobile logout button styles - softer appearance */
+            .btn-logout {
+                width: 100%;
+                min-height: 42px;
+                font-size: 13px;
+                background: rgba(255, 70, 70, 0.12);
+                color: rgba(255, 255, 255, 0.95);
+                border: 1px solid rgba(255, 70, 70, 0.25);
+                font-weight: 500;
+                padding: var(--space-xs) var(--space-sm);
+            }
+
+            .btn-logout:hover,
+            .btn-logout:active {
+                background: rgba(255, 70, 70, 0.2);
+                color: white;
+                transform: none;
+            }
+
+            /* Adjust font sizes for small screens */
+            :root {
+                --font-size-base: 14px;
+                --font-size-sm: 12px;
+                --font-size-lg: 15px;
+                --font-size-xl: 17px;
+            }
+
+            /* Login screen optimizations */
+            .login-container {
+                padding: var(--space-sm);
+            }
+
+            .login-card {
+                max-width: 100%;
+            }
+
+            .login-header {
+                padding: var(--space-md);
+            }
+
+            .login-header h1 {
+                font-size: 1.1rem;
+            }
+
+            .login-header p {
+                font-size: 0.75rem;
+            }
+
+            .login-body {
+                padding: var(--space-md);
+            }
+
+            .form-input {
+                padding: var(--space-sm) var(--space-md);
+                font-size: 16px; /* Prevent iOS zoom */
+                min-height: 44px;
+            }
+
+            .btn-login {
+                min-height: 44px;
+                font-size: 0.9rem;
+            }
+
+            .login-footer {
+                padding: var(--space-sm);
+                font-size: 0.7rem;
+            }
+
+            /* Page loader adjustments */
+            .loader-spinner {
+                width: 60px;
+                height: 60px;
+            }
+
+            .loader-text {
+                font-size: 0.85rem;
+            }
+
+            .loader-progress {
+                width: 160px;
+            }
+        }
+
+        /* Extra small mobile devices */
+        @media (max-width: 360px) {
+            .brand {
+                font-size: 0.9rem;
+                padding: var(--space-sm);
+            }
+
+            .nav-links a {
+                padding: var(--space-sm) var(--space-md);
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Tablet Portrait (768px to 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .navbar {
+                flex-wrap: wrap;
+            }
+
+            .brand {
+                flex: 1 0 100%;
+                text-align: center;
+                border-right: none;
+                border-bottom: 2px solid rgba(255,255,255,0.2);
+            }
+
+            .nav-links {
+                flex: 1;
+            }
+
+            .nav-links a {
+                font-size: 0.9rem;
+                padding: var(--space-md) var(--space-lg);
+            }
+
+            .login-card {
+                max-width: 500px;
+            }
+        }
+
+        /* Tablet Landscape / Small Desktop (1024px to 1439px) */
+        @media (min-width: 1024px) and (max-width: 1439px) {
+            .navbar {
+                flex-wrap: nowrap;
+            }
+
+            .nav-links a {
+                padding: var(--space-lg) var(--space-xl);
+            }
+        }
+
+        /* Large Desktop (1440px and up) */
+        @media (min-width: 1440px) {
+            :root {
+                --font-size-base: 15px;
+                --font-size-lg: 17px;
+                --font-size-xl: 22px;
+            }
+
+            .brand {
+                font-size: 1.4rem;
+                padding: var(--space-xl);
+            }
+
+            .nav-links a {
+                padding: var(--space-xl);
+                font-size: 1rem;
+            }
+        }
+
+        /* Landscape Mode Optimization for Mobile */
+        @media (max-width: 767px) and (max-height: 500px) and (orientation: landscape) {
+            /* Keep hamburger menu even in landscape for small screens */
+            .navbar {
+                min-height: 45px;
+                max-height: 45px;
+            }
+
+            .brand {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: 0.9rem;
+            }
+
+            .nav-links {
+                top: 45px;
+            }
+
+            .nav-links a {
+                padding: var(--space-sm) var(--space-md);
+                min-height: 40px;
+                font-size: 0.8rem;
+            }
+
+            .nav-actions {
+                padding: var(--space-sm);
+            }
+
+            .btn-logout {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: 0.75rem;
+                min-height: 40px;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-links a,
+            .btn-logout,
+            .btn-login,
+            .form-input {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Remove hover effects on touch devices */
+            .nav-links a:hover,
+            .btn-logout:hover,
+            .btn-login:hover {
+                transform: none;
+            }
+
+            /* Add active/pressed states for touch feedback */
+            .nav-links a:active,
+            .btn-logout:active,
+            .btn-login:active {
+                transform: scale(0.98);
+                opacity: 0.9;
+            }
+        }
+
+        /* Smooth Transitions */
+        .navbar,
+        .nav-links a,
+        .btn-logout,
+        .btn-login,
+        .login-card {
+            transition: all var(--transition-base);
+        }
+
+        /* Prevent horizontal scroll */
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        #appScreen {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        /* ============================================================
+           MOBILE VIEWPORT HEIGHT FIX
+           ============================================================ */
+        /*
+         * Mobile browsers (especially Safari) have issues with 100vh
+         * because the address bar changes the viewport height.
+         * We use 100dvh (dynamic viewport height) as primary,
+         * with 100vh as fallback for older browsers.
+         * This ensures the iframe always fills the visible area.
+         */
+        @supports (height: 100dvh) {
+            html {
+                height: 100dvh;
+            }
+
+            body {
+                min-height: 100dvh;
+            }
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                /* iOS Safari */
+                min-height: -webkit-fill-available;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container hidden">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🔧 نظام تتبع الصيانات</h1>
+                <p>يرجى تسجيل الدخول للمتابعة</p>
+            </div>
+            <div class="login-body">
+                <div id="errorMessage" class="error-message hidden"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label" for="username">👤 اسم المستخدم</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-input"
+                            placeholder="أدخل اسم المستخدم"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">🔒 كلمة المرور</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            placeholder="أدخل كلمة المرور"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn-login">🔐 تسجيل الدخول</button>
+                </form>
+            </div>
+            <div class="login-footer">
+                وصول آمن لإدارة الصيانات
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Screen (shown after login) -->
+    <div id="appScreen" class="hidden">
+        <nav class="navbar">
+            <div class="brand">🔧 Repair Tracking</div>
+            <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="?page=dashboard" data-page="dashboard">📊 لوحة التحكم</a></li>
+                <li><a href="?page=form" data-page="form">📝 إصلاح جديد</a></li>
+                <li><a href="?page=scanner" data-page="scanner">🔍 الماسح الضوئي</a></li>
+                <li id="repairCenterLink" style="display: none;"><a href="?page=repaircenter" data-page="repaircenter">🔧 مركز الصيانة</a></li>
+                <li><a href="?page=reports" data-page="reports">📈 التقارير</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button id="logoutBtn" class="btn-logout">🚪 تسجيل الخروج</button>
+            </div>
+        </nav>
+        <div class="content">
+            <iframe id="appFrame" src="" allow="camera; microphone; geolocation" allowfullscreen></iframe>
+            <!-- Page Transition Loader -->
+            <div id="pageLoader" class="page-loader">
+                <div class="loader-spinner">
+                    <div class="spinner-ring"></div>
+                    <div class="spinner-ring-inner"></div>
+                    <div class="spinner-dot"></div>
+                </div>
+                <div class="loader-text">Loading page...</div>
+                <div class="loader-progress">
+                    <div class="loader-progress-bar"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION - UPDATE THIS WHEN DEPLOYING
+        // ============================================================
+
+        const CONFIG = {
+            // DEPLOY URL - Only update this single URL when deploying new version
+            DEPLOY_URL: 'https://script.google.com/macros/s/AKfycbywHlvehcNsZ6RkqNWpYpvPBqeVICE8l3gwVaqu8sDl3UF_Uwl06F_I5-gUdE3WtCBP/exec'
+        };
+
+        // ============================================================
+        // AUTHENTICATION MODULE - SECURE BACKEND INTEGRATION
+        // ============================================================
+
+        const AuthModule = {
+            // Storage key for session
+            SESSION_KEY: 'repair_tracking_session',
+
+            // API Base URL
+            API_BASE_URL: CONFIG.DEPLOY_URL,
+
+            /**
+             * Make API call to backend using JSONP (bypasses CORS)
+             * Falls back to fetch with CORS if JSONP fails
+             */
+            async apiCall(action, params = {}) {
+                // Try JSONP first (works best with Apps Script)
+                try {
+                    return await this.apiCallJsonp(action, params);
+                } catch (jsonpError) {
+                    console.warn('JSONP failed, trying fetch with CORS:', jsonpError);
+                    // Fallback to fetch (requires CORS headers)
+                    try {
+                        return await this.apiCallFetch(action, params);
+                    } catch (fetchError) {
+                        console.error('Both JSONP and fetch failed:', fetchError);
+                        throw new Error('Unable to connect to server. Please check your connection.');
+                    }
+                }
+            },
+
+            /**
+             * Make JSONP request
+             */
+            async apiCallJsonp(action, params = {}) {
+                return new Promise((resolve, reject) => {
+                    // Generate unique callback name
+                    const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                    // Build URL with parameters
+                    const url = new URL(this.API_BASE_URL);
+                    url.searchParams.append('action', action);
+                    url.searchParams.append('callback', callbackName);
+
+                    Object.keys(params).forEach(key => {
+                        url.searchParams.append(key, params[key]);
+                    });
+
+                    // Set timeout
+                    const timeout = setTimeout(() => {
+                        cleanup();
+                        reject(new Error('Request timeout - server took too long to respond'));
+                    }, 30000); // 30 second timeout
+
+                    // Create callback function
+                    window[callbackName] = function(data) {
+                        cleanup();
+                        resolve(data);
+                    };
+
+                    // Cleanup function
+                    const cleanup = () => {
+                        clearTimeout(timeout);
+                        delete window[callbackName];
+                        if (script && script.parentNode) {
+                            script.parentNode.removeChild(script);
+                        }
+                    };
+
+                    // Create script tag for JSONP
+                    const script = document.createElement('script');
+                    script.src = url.toString();
+                    script.onerror = (e) => {
+                        cleanup();
+                        reject(new Error('Network error - failed to load script from server'));
+                    };
+
+                    document.head.appendChild(script);
+                });
+            },
+
+            /**
+             * Make fetch request with CORS (fallback)
+             */
+            async apiCallFetch(action, params = {}) {
+                const url = new URL(this.API_BASE_URL);
+                url.searchParams.append('action', action);
+
+                Object.keys(params).forEach(key => {
+                    url.searchParams.append(key, params[key]);
+                });
+
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'omit',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server returned ' + response.status);
+                }
+
+                return await response.json();
+            },
+
+            /**
+             * Validate credentials against backend
+             */
+            async validateCredentials(username, password) {
+                try {
+                    const result = await this.apiCall('login', { username, password });
+
+                    if (result.success) {
+                        // Store session data from server
+                        const sessionData = {
+                            token: result.session.token,
+                            username: result.session.username,
+                            role: result.session.role,
+                            permissions: result.permissions,
+                            expiresAt: result.session.expiresAt
+                        };
+
+                        localStorage.setItem(this.SESSION_KEY, JSON.stringify(sessionData));
+                        return sessionData;
+                    }
+
+                    return null;
+                } catch (error) {
+                    console.error('Login error:', error);
+                    throw error;
+                }
+            },
+
+            /**
+             * Validate session with backend
+             */
+            async validateSession(token) {
+                try {
+                    const result = await this.apiCall('validateSession', { token });
+                    return result.success ? result.session : null;
+                } catch (error) {
+                    console.error('Session validation error:', error);
+                    return null;
+                }
+            },
+
+            /**
+             * Get current session from localStorage
+             */
+            getSession() {
+                try {
+                    const sessionData = localStorage.getItem(this.SESSION_KEY);
+                    if (!sessionData) return null;
+
+                    const session = JSON.parse(sessionData);
+
+                    // Check if session has expired locally
+                    if (session.expiresAt && Date.now() > session.expiresAt) {
+                        this.destroySession();
+                        return null;
+                    }
+
+                    return session;
+                } catch (error) {
+                    console.error('Error reading session:', error);
+                    return null;
+                }
+            },
+
+            /**
+             * Check if user is authenticated
+             */
+            async isAuthenticated() {
+                const session = this.getSession();
+
+                if (!session || !session.token) {
+                    return false;
+                }
+
+                // Validate with backend
+                const validSession = await this.validateSession(session.token);
+                return validSession !== null;
+            },
+
+            /**
+             * Check if user has permission for a page
+             */
+            async checkPageAccess(page) {
+                const session = this.getSession();
+                if (!session || !session.token) {
+                    return { hasAccess: false, defaultPage: null };
+                }
+
+                try {
+                    const result = await this.apiCall('checkPageAccess', {
+                        token: session.token,
+                        page: page
+                    });
+
+                    return {
+                        hasAccess: result.hasAccess,
+                        defaultPage: result.defaultPage
+                    };
+                } catch (error) {
+                    console.error('Permission check error:', error);
+                    return { hasAccess: false, defaultPage: null };
+                }
+            },
+
+            /**
+             * Destroy session (logout)
+             */
+            async destroySession() {
+                const session = this.getSession();
+
+                // Call backend logout if we have a token
+                if (session && session.token) {
+                    try {
+                        await this.apiCall('logout', { token: session.token });
+                    } catch (error) {
+                        console.error('Logout error:', error);
+                    }
+                }
+
+                // Clear local storage
+                localStorage.removeItem(this.SESSION_KEY);
+            }
+        };
+
+        // ============================================================
+        // UI CONTROLLER
+        // ============================================================
+
+        const UIController = {
+            elements: {
+                loginScreen: document.getElementById('loginScreen'),
+                appScreen: document.getElementById('appScreen'),
+                loginForm: document.getElementById('loginForm'),
+                errorMessage: document.getElementById('errorMessage'),
+                logoutBtn: document.getElementById('logoutBtn'),
+                usernameInput: document.getElementById('username'),
+                passwordInput: document.getElementById('password')
+            },
+
+            showLogin() {
+                this.elements.loginScreen.classList.remove('hidden');
+                this.elements.appScreen.classList.add('hidden');
+                this.clearLoginForm();
+                this.elements.usernameInput.focus();
+            },
+
+            showApp() {
+                this.elements.loginScreen.classList.add('hidden');
+                this.elements.appScreen.classList.remove('hidden');
+            },
+
+            showError(message) {
+                this.elements.errorMessage.textContent = message;
+                this.elements.errorMessage.classList.remove('hidden');
+            },
+
+            hideError() {
+                this.elements.errorMessage.classList.add('hidden');
+            },
+
+            clearLoginForm() {
+                this.elements.loginForm.reset();
+                this.hideError();
+            },
+
+            disableLoginButton() {
+                const submitBtn = this.elements.loginForm.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ جارٍ تسجيل الدخول...';
+            },
+
+            enableLoginButton() {
+                const submitBtn = this.elements.loginForm.querySelector('button[type="submit"]');
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🔐 تسجيل الدخول';
+            }
+        };
+
+        // ============================================================
+        // DEVICE DETECTION & RESPONSIVE UTILITIES
+        // ============================================================
+
+        const DeviceDetection = {
+            detectDevice() {
+                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+                const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(userAgent.toLowerCase());
+                const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+
+                if (isMobile || (screenWidth < 768 && isTouchDevice)) {
+                    document.body.classList.add('mobile-device');
+                    document.body.classList.remove('desktop-device');
+                    return 'mobile';
+                } else if (isTablet || (screenWidth >= 768 && screenWidth < 1024 && isTouchDevice)) {
+                    document.body.classList.add('mobile-device');
+                    document.body.classList.remove('desktop-device');
+                    return 'tablet';
+                } else {
+                    document.body.classList.add('desktop-device');
+                    document.body.classList.remove('mobile-device');
+                    return 'desktop';
+                }
+            },
+
+            applyViewportFix() {
+                const setVH = () => {
+                    const vh = window.innerHeight * 0.01;
+                    document.documentElement.style.setProperty('--vh', `${vh}px`);
+                };
+
+                setVH();
+                window.addEventListener('resize', setVH);
+                window.addEventListener('orientationchange', setVH);
+            },
+
+            logDeviceInfo() {
+                const deviceType = this.detectDevice();
+                const screenWidth = window.innerWidth;
+                const screenHeight = window.innerHeight;
+                const pixelRatio = window.devicePixelRatio || 1;
+
+                console.log('🔧 Repair Tracker Parent - Device Info:');
+                console.log('  Device Type:', deviceType);
+                console.log('  Screen Size:', `${screenWidth}x${screenHeight}`);
+                console.log('  Pixel Ratio:', pixelRatio);
+                console.log('  Touch Support:', ('ontouchstart' in window) ? 'Yes' : 'No');
+                console.log('  Orientation:', screen.orientation ? screen.orientation.type : 'Unknown');
+            },
+
+            init() {
+                this.detectDevice();
+                this.applyViewportFix();
+                this.logDeviceInfo();
+
+                // Re-detect device on window resize
+                window.addEventListener('resize', () => {
+                    this.detectDevice();
+                });
+
+                // Handle orientation changes smoothly
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => {
+                        this.detectDevice();
+                        this.applyViewportFix();
+                    }, 100);
+                });
+            }
+        };
+
+        // ============================================================
+        // APPLICATION CONTROLLER
+        // ============================================================
+
+        const AppController = {
+            BASE_URL: CONFIG.DEPLOY_URL,
+            iframe: document.getElementById('appFrame'),
+            pageLoader: document.getElementById('pageLoader'),
+            links: document.querySelectorAll('.nav-links a'),
+
+            async init() {
+                // Initialize device detection first
+                DeviceDetection.init();
+
+                // Check authentication on load
+                const isAuth = await AuthModule.isAuthenticated();
+
+                if (isAuth) {
+                    this.showAuthenticatedApp();
+                } else {
+                    UIController.showLogin();
+                }
+
+                // Setup event listeners
+                this.setupEventListeners();
+            },
+
+            setupEventListeners() {
+                // Login form submission
+                UIController.elements.loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    await this.handleLogin();
+                });
+
+                // Logout button
+                UIController.elements.logoutBtn.addEventListener('click', () => {
+                    this.handleLogout();
+                });
+
+                // Hamburger menu toggle
+                const hamburger = document.getElementById('hamburgerBtn');
+                const navLinks = document.getElementById('navLinks');
+                const navActions = document.querySelector('.nav-actions');
+
+                if (hamburger) {
+                    hamburger.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        this.toggleMobileMenu(hamburger, navLinks, navActions);
+                    });
+                }
+
+                // Navigation links
+                this.links.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.getAttribute('data-page');
+                        window.history.pushState({page}, '', `?page=${page}`);
+                        this.loadPage(page);
+
+                        // Close mobile menu after selecting a page
+                        if (window.innerWidth < 768) {
+                            this.closeMobileMenu(hamburger, navLinks, navActions);
+                        }
+                    });
+                });
+
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (window.innerWidth < 768) {
+                        const isClickInsideMenu = navLinks?.contains(e.target) ||
+                                                  navActions?.contains(e.target) ||
+                                                  hamburger?.contains(e.target);
+
+                        if (!isClickInsideMenu && navLinks?.classList.contains('active')) {
+                            this.closeMobileMenu(hamburger, navLinks, navActions);
+                        }
+                    }
+                });
+
+                // Browser back/forward
+                window.addEventListener('popstate', (e) => {
+                    const page = e.state?.page || this.getPageFromURL();
+                    this.loadPage(page);
+                });
+
+                // Iframe load event - hide loader when page finishes loading
+                this.iframe.addEventListener('load', () => {
+                    this.hideLoader();
+                });
+
+                // Close mobile menu on window resize to desktop
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth >= 768) {
+                        this.closeMobileMenu(hamburger, navLinks, navActions);
+                    }
+                });
+            },
+
+            toggleMobileMenu(hamburger, navLinks, navActions) {
+                hamburger?.classList.toggle('active');
+                navLinks?.classList.toggle('active');
+                navActions?.classList.toggle('active');
+            },
+
+            closeMobileMenu(hamburger, navLinks, navActions) {
+                hamburger?.classList.remove('active');
+                navLinks?.classList.remove('active');
+                navActions?.classList.remove('active');
+            },
+
+            showLoader() {
+                // Show the loader immediately
+                this.pageLoader.classList.remove('loaded');
+                this.pageLoader.classList.add('active');
+            },
+
+            hideLoader() {
+                // Add loaded class for fast fade-out
+                this.pageLoader.classList.add('loaded');
+
+                // Remove active class after fade completes
+                setTimeout(() => {
+                    this.pageLoader.classList.remove('active');
+                    this.pageLoader.classList.remove('loaded');
+                }, 250); // Match CSS transition duration
+            },
+
+            async handleLogin() {
+                UIController.hideError();
+                UIController.disableLoginButton();
+
+                const username = UIController.elements.usernameInput.value.trim();
+                const password = UIController.elements.passwordInput.value;
+
+                try {
+                    const sessionData = await AuthModule.validateCredentials(username, password);
+
+                    if (sessionData) {
+                        this.showAuthenticatedApp();
+                    } else {
+                        UIController.showError('❌ اسم المستخدم أو كلمة المرور غير صحيحة');
+                        UIController.elements.passwordInput.value = '';
+                        UIController.elements.passwordInput.focus();
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    UIController.showError('⚠️ خطأ في الاتصال. يرجى التحقق من الإنترنت والمحاولة مرة أخرى.');
+                } finally {
+                    UIController.enableLoginButton();
+                }
+            },
+
+            async handleLogout() {
+                if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                    await AuthModule.destroySession();
+                    this.iframe.src = ''; // Clear iframe
+                    UIController.showLogin();
+                }
+            },
+
+            showAuthenticatedApp() {
+                UIController.showApp();
+
+                // Show RepairCenter link only for tech and admin users
+                const session = AuthModule.getSession();
+                if (session && (session.role === 'tech' || session.role === 'admin')) {
+                    document.getElementById('repairCenterLink').style.display = 'block';
+                }
+
+                const initialPage = this.getPageFromURL();
+                this.loadPage(initialPage);
+            },
+
+            async loadPage(page) {
+                // Show loader IMMEDIATELY - before any async operations
+                this.showLoader();
+
+                const session = AuthModule.getSession();
+
+                if (!session || !session.token) {
+                    this.hideLoader(); // Hide loader if not authenticated
+                    UIController.showLogin();
+                    return;
+                }
+
+                // Check if user has access to this page
+                const accessCheck = await AuthModule.checkPageAccess(page);
+
+                if (!accessCheck.hasAccess) {
+                    // Redirect to default page for user's role
+                    if (accessCheck.defaultPage && page !== accessCheck.defaultPage) {
+                        alert('ليس لديك إذن للوصول إلى هذه الصفحة. إعادة التوجيه إلى ' + accessCheck.defaultPage + '.');
+                        page = accessCheck.defaultPage;
+                    } else {
+                        this.hideLoader(); // Hide loader if no access
+                        alert('ليس لديك إذن للوصول إلى هذه الصفحة.');
+                        return;
+                    }
+                }
+
+                // Include session token in URL
+                const url = page
+                    ? `${this.BASE_URL}?page=${page}&token=${session.token}`
+                    : `${this.BASE_URL}?page=form&token=${session.token}`;
+
+                this.iframe.src = url;
+
+                // Update active link
+                this.links.forEach(link => {
+                    const linkPage = link.getAttribute('data-page');
+                    if (linkPage === page) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            },
+
+            getPageFromURL() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('page') || 'form'; // Default to New Repair form
+            }
+        };
+
+        // Apply RTL mode by default for Arabic
+        document.body.classList.add('rtl-mode');
+
+        // ============================================================
+        // INITIALIZE APPLICATION
+        // ============================================================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize app
+            AppController.init();
+        });
+    </script>
+</body>
+</html>

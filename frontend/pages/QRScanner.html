@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <title>ماسح رمز الاستجابة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        /* ============================================================
+           LIQUID GLASS DESIGN SYSTEM
+           Apple-Inspired Glassmorphism Aesthetic
+           ============================================================ */
+
+        /* CSS Variables - Core Design Tokens */
+        :root {
+            /* Apple-Inspired Color Palette */
+            --color-primary: #007AFF;
+            --color-primary-light: #5AC8FA;
+            --color-primary-dark: #0051D5;
+            --color-accent: #5E5CE6;
+            --color-accent-dark: #4644CC;
+            --color-accent-light: #BF5AF2;
+            --color-success: #34C759;
+            --color-warning: #FF9500;
+            --color-error: #FF3B30;
+            --color-info: #5AC8FA;
+
+            /* Neutral Glass Tones */
+            --color-background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            --color-surface: rgba(255, 255, 255, 0.7);
+            --color-surface-elevated: rgba(255, 255, 255, 0.85);
+            --color-glass: rgba(255, 255, 255, 0.25);
+            --color-glass-hover: rgba(255, 255, 255, 0.35);
+            --color-border: rgba(0, 0, 0, 0.08);
+            --color-border-light: rgba(255, 255, 255, 0.18);
+            --color-text: #1D1D1F;
+            --color-text-secondary: #6E6E73;
+            --color-text-tertiary: #8E8E93;
+
+            /* Typography - SF Pro-like */
+            --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', 'Segoe UI Arabic', 'Tahoma', sans-serif;
+            --font-family-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+            --font-mono: 'SF Mono', 'Monaco', 'Courier New', monospace;
+            --font-size-base: 15px;
+            --font-size-sm: 13px;
+            --font-size-lg: 17px;
+            --font-size-xl: 22px;
+            --font-size-xxl: 28px;
+
+            /* Spacing - Generous Apple-style */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+
+            /* Glass Shadows - Soft & Layered */
+            --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+
+            /* Border Radius - Rounded Apple Style */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+
+            /* Transitions - Smooth & Fluid */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Blur Effects */
+            --blur-sm: 10px;
+            --blur-md: 20px;
+            --blur-lg: 40px;
+        }
+
+        /* ============================================================
+           BASE STYLES
+           ============================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: var(--font-size-base);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding: var(--space-lg);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding: var(--space-xl);
+            background: var(--color-surface-elevated);
+            backdrop-filter: blur(var(--blur-md));
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-glass);
+            border: 1px solid var(--color-border-light);
+        }
+
+        .page-header h1 {
+            font-family: var(--font-family-display);
+            font-size: var(--font-size-xxl);
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+        }
+
+        /* ============================================================
+           CARDS
+           ============================================================ */
+
+        .card {
+            background: var(--color-surface-elevated);
+            backdrop-filter: blur(var(--blur-md));
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-glass);
+            border: 1px solid var(--color-border-light);
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--color-text);
+        }
+
+        /* ============================================================
+           MODE SELECTOR
+           ============================================================ */
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .mode-option {
+            background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-glass) 100%);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .mode-option:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+        }
+
+        .mode-option.active {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-color: var(--color-primary);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mode-option .icon {
+            font-size: 32px;
+            margin-bottom: var(--space-sm);
+        }
+
+        .mode-option .label {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           QR SCANNER
+           ============================================================ */
+
+        #reader {
+            max-width: 100%;
+            margin: 0 auto var(--space-lg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .btn {
+            width: 100%;
+            padding: var(--space-md) var(--space-xl);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--color-success) 0%, #2d9c4e 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--color-warning) 0%, #e08600 100%);
+        }
+
+        .btn-error {
+            background: linear-gradient(135deg, var(--color-error) 0%, #d32f2f 100%);
+        }
+
+        /* ============================================================
+           REPAIR DETAILS
+           ============================================================ */
+
+        .repair-details {
+            display: none;
+        }
+
+        .repair-details.visible {
+            display: block;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--color-text-secondary);
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .status-received {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--color-primary);
+        }
+
+        .status-in-repair {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--color-warning);
+        }
+
+        .status-complete {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--color-success);
+        }
+
+        .status-unrepairable {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--color-error);
+        }
+
+        .status-ready {
+            background: rgba(94, 92, 230, 0.1);
+            color: var(--color-accent);
+        }
+
+        /* ============================================================
+           LOADING OVERLAY
+           ============================================================ */
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-md);
+            }
+
+            .page-header {
+                padding: var(--space-lg);
+            }
+
+            .page-header h1 {
+                font-size: var(--font-size-xl);
+            }
+
+            .mode-selector {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: var(--space-lg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📱 ماسح رمز QR</h1>
+            <p>اختر الإجراء وامسح رمز QR للتحديث</p>
+        </div>
+
+        <!-- Mode Selector -->
+        <div class="card">
+            <h2 class="card-title">اختر الإجراء</h2>
+            <div class="mode-selector">
+                <div class="mode-option active" data-mode="view" onclick="selectMode('view')">
+                    <div class="icon">👁️</div>
+                    <div class="label">عرض التفاصيل</div>
+                </div>
+                <div class="mode-option" data-mode="return" onclick="selectMode('return')">
+                    <div class="icon">🔙</div>
+                    <div class="label">إرجاع للفرع</div>
+                </div>
+                <div class="mode-option" data-mode="deliver" onclick="selectMode('deliver')">
+                    <div class="icon">✅</div>
+                    <div class="label">تم التسليم للزبون</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Scanner -->
+        <div class="card">
+            <h2 class="card-title">امسح رمز QR</h2>
+            <div id="reader"></div>
+            <button class="btn" id="startScanBtn" onclick="startScanning()">
+                📸 بدء المسح
+            </button>
+        </div>
+
+        <!-- Repair Details -->
+        <div class="card repair-details" id="repairDetails">
+            <h2 class="card-title">تفاصيل الطلب</h2>
+            <div class="detail-row">
+                <span class="detail-label">رقم الطلب:</span>
+                <span class="detail-value" id="detailRepairId">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">العميل:</span>
+                <span class="detail-value" id="detailCustomer">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">الهاتف:</span>
+                <span class="detail-value" id="detailPhone">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">الجهاز:</span>
+                <span class="detail-value" id="detailDevice">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">المشكلة:</span>
+                <span class="detail-value" id="detailIssue">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">الحالة الحالية:</span>
+                <span class="detail-value"><span id="detailStatus" class="status-badge">-</span></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">الفرع:</span>
+                <span class="detail-value" id="detailBranch">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">التكلفة:</span>
+                <span class="detail-value" id="detailCost">-</span>
+            </div>
+            <div class="detail-row" id="imageRow" style="display: none;">
+                <span class="detail-label">صورة الجهاز:</span>
+                <img id="detailImage" style="max-width: 100%; border-radius: var(--radius-md); margin-top: var(--space-md);" />
+            </div>
+            <button class="btn btn-success" id="updateStatusBtn" onclick="updateStatus()" style="margin-top: var(--space-lg); display: none;">
+                تحديث الحالة
+            </button>
+
+            <!-- Quick Action Shortcuts for View Mode -->
+            <div id="quickActionsContainer" style="display: none; margin-top: var(--space-lg); gap: var(--space-md);">
+                <button class="btn btn-warning" onclick="quickUpdateStatus('return')" style="margin-bottom: var(--space-sm);">
+                    🔙 إرجاع للفرع
+                </button>
+                <button class="btn btn-success" onclick="quickUpdateStatus('deliver')">
+                    ✅ تسليم للزبون
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // Global variables
+        let html5QrCode = null;
+        let currentMode = 'view';
+        let currentRepair = null;
+
+        // Status mapping
+        const STATUS_MAP = {
+            return: 'جاهز للاستلام',
+            deliver: 'تم استلام من قبل الزبون'
+        };
+
+        // Beep sound function for QR scan success
+        function playBeep() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                // High-pitched beep at 1200Hz
+                oscillator.frequency.value = 1200;
+                oscillator.type = 'sine';
+
+                // Loud volume
+                gainNode.gain.value = 0.8;
+
+                // Play beep for 200ms
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+
+                // Cleanup
+                setTimeout(() => {
+                    oscillator.disconnect();
+                    gainNode.disconnect();
+                    audioContext.close();
+                }, 300);
+            } catch (error) {
+                console.error('Failed to play beep:', error);
+            }
+        }
+
+        // Select mode
+        function selectMode(mode) {
+            currentMode = mode;
+
+            // Update UI
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+
+            // Hide repair details
+            document.getElementById('repairDetails').classList.remove('visible');
+            currentRepair = null;
+        }
+
+        // Start QR scanning
+        function startScanning() {
+            const startBtn = document.getElementById('startScanBtn');
+
+            if (html5QrCode) {
+                // Scanner already initialized, just start
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err => {
+                    console.error('Error starting scanner:', err);
+                    alert('خطأ في تشغيل الكاميرا: ' + err);
+                });
+            } else {
+                // Initialize scanner
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err => {
+                    console.error('Error initializing scanner:', err);
+                    alert('خطأ في تشغيل الكاميرا: ' + err);
+                });
+            }
+
+            startBtn.textContent = '🔄 جارٍ المسح...';
+            startBtn.disabled = true;
+        }
+
+        // QR scan success handler
+        function onScanSuccess(decodedText, decodedResult) {
+            // Play beep sound
+            playBeep();
+
+            // Stop scanning
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    console.log('Scanner stopped');
+                }).catch(err => {
+                    console.error('Error stopping scanner:', err);
+                });
+            }
+
+            // Reset scan button
+            const startBtn = document.getElementById('startScanBtn');
+            startBtn.textContent = '📸 بدء المسح';
+            startBtn.disabled = false;
+
+            // Load repair details
+            loadRepairDetails(decodedText.trim());
+        }
+
+        // QR scan failure handler
+        function onScanFailure(error) {
+            // Handle scan failure silently
+        }
+
+        // Load repair details
+        function loadRepairDetails(repairId) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            google.script.run
+                .withSuccessHandler(function(repair) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+
+                    if (!repair) {
+                        alert('خطأ: رقم الطلب غير موجود');
+                        return;
+                    }
+
+                    // Store current repair
+                    currentRepair = repair;
+
+                    // Display repair details
+                    document.getElementById('detailRepairId').textContent = repair.repairId;
+                    document.getElementById('detailCustomer').textContent = repair.customer;
+                    document.getElementById('detailPhone').textContent = repair.phone || '-';
+                    document.getElementById('detailDevice').textContent = repair.device;
+                    document.getElementById('detailIssue').textContent = repair.issue || '-';
+                    document.getElementById('detailBranch').textContent = repair.branch;
+                    document.getElementById('detailCost').textContent = repair.estimatedCost || '-';
+
+                    // Set status badge
+                    const statusBadge = document.getElementById('detailStatus');
+                    statusBadge.textContent = repair.repairStatus;
+                    statusBadge.className = 'status-badge ' + getStatusClass(repair.repairStatus);
+
+                    // Show image if available
+                    if (repair.imageDataUrl) {
+                        document.getElementById('imageRow').style.display = 'flex';
+                        document.getElementById('detailImage').src = repair.imageDataUrl;
+                    } else {
+                        document.getElementById('imageRow').style.display = 'none';
+                    }
+
+                    // Show/hide update button and quick actions based on mode
+                    const updateBtn = document.getElementById('updateStatusBtn');
+                    const quickActionsContainer = document.getElementById('quickActionsContainer');
+
+                    if (currentMode === 'view') {
+                        updateBtn.style.display = 'none';
+                        // Show quick actions shortcuts in view mode
+                        quickActionsContainer.style.display = 'block';
+                    } else {
+                        quickActionsContainer.style.display = 'none';
+
+                        if (currentMode === 'return') {
+                            // Only allow return if status is complete or unrepairable
+                            if (repair.repairStatus.includes('مكتمل') || repair.repairStatus.includes('غير قابل')) {
+                                updateBtn.style.display = 'block';
+                                updateBtn.textContent = 'إرجاع للفرع';
+                            } else {
+                                updateBtn.style.display = 'none';
+                                alert('تنبيه: لا يمكن إرجاع الطلب للفرع إلا إذا كان مكتمل أو غير قابل للصيانة');
+                            }
+                        } else if (currentMode === 'deliver') {
+                            updateBtn.style.display = 'block';
+                            updateBtn.textContent = 'تسليم للزبون';
+                        }
+                    }
+
+                    // Show repair details
+                    document.getElementById('repairDetails').classList.add('visible');
+
+                    // Scroll to details
+                    document.getElementById('repairDetails').scrollIntoView({ behavior: 'smooth' });
+                })
+                .withFailureHandler(function(error) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    alert('خطأ: فشل في تحميل التفاصيل - ' + error.message);
+                })
+                .searchByQRCode(repairId);
+        }
+
+        // Get status class
+        function getStatusClass(status) {
+            if (status.includes('تم استلام في مركز') || status.includes('تم استلام في')) {
+                return 'status-received';
+            } else if (status.includes('قيد الصيانة')) {
+                return 'status-in-repair';
+            } else if (status.includes('مكتمل')) {
+                return 'status-complete';
+            } else if (status.includes('غير قابل')) {
+                return 'status-unrepairable';
+            } else if (status.includes('جاهز')) {
+                return 'status-ready';
+            }
+            return 'status-received';
+        }
+
+        // Update status
+        function updateStatus() {
+            if (!currentRepair) {
+                alert('خطأ: لا يوجد طلب محدد');
+                return;
+            }
+
+            if (currentMode === 'view') {
+                alert('خطأ: يرجى اختيار إجراء للتحديث');
+                return;
+            }
+
+            const newStatus = STATUS_MAP[currentMode];
+            const repairId = currentRepair.repairId;
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+
+                    if (result.success) {
+                        alert('✅ تم تحديث الحالة بنجاح إلى: ' + newStatus);
+
+                        // Update current repair status
+                        currentRepair.repairStatus = newStatus;
+
+                        // Update display
+                        const statusBadge = document.getElementById('detailStatus');
+                        statusBadge.textContent = newStatus;
+                        statusBadge.className = 'status-badge ' + getStatusClass(newStatus);
+
+                        // Hide update button
+                        document.getElementById('updateStatusBtn').style.display = 'none';
+
+                        // Hide details after short delay
+                        setTimeout(() => {
+                            document.getElementById('repairDetails').classList.remove('visible');
+                            currentRepair = null;
+                        }, 2000);
+                    } else {
+                        alert('خطأ: فشل في تحديث الحالة');
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    alert('خطأ: فشل في تحديث الحالة - ' + error.message);
+                })
+                .updateRepairStatus(repairId, newStatus, '', '', '', 'QR Scanner');
+        }
+
+        // Quick update status - shortcuts for view mode
+        function quickUpdateStatus(action) {
+            if (!currentRepair) {
+                alert('خطأ: لا يوجد طلب محدد');
+                return;
+            }
+
+            // For 'return' action, check if status allows it
+            if (action === 'return') {
+                if (!currentRepair.repairStatus.includes('مكتمل') && !currentRepair.repairStatus.includes('غير قابل')) {
+                    alert('تنبيه: لا يمكن إرجاع الطلب للفرع إلا إذا كان مكتمل أو غير قابل للصيانة\n\nالحالة الحالية: ' + currentRepair.repairStatus);
+                    return;
+                }
+            }
+
+            const newStatus = STATUS_MAP[action];
+            const repairId = currentRepair.repairId;
+
+            // Confirm action
+            const confirmMessage = action === 'return'
+                ? '🔙 هل تريد إرجاع الطلب للفرع؟'
+                : '✅ هل تريد تسليم الطلب للزبون؟';
+
+            if (!confirm(confirmMessage + '\n\nرقم الطلب: ' + repairId + '\nالعميل: ' + currentRepair.customer)) {
+                return;
+            }
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            google.script.run
+                .withSuccessHandler(function(result) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+
+                    if (result.success) {
+                        alert('✅ تم تحديث الحالة بنجاح إلى: ' + newStatus);
+
+                        // Update current repair status
+                        currentRepair.repairStatus = newStatus;
+
+                        // Update display
+                        const statusBadge = document.getElementById('detailStatus');
+                        statusBadge.textContent = newStatus;
+                        statusBadge.className = 'status-badge ' + getStatusClass(newStatus);
+
+                        // Hide quick actions after update
+                        document.getElementById('quickActionsContainer').style.display = 'none';
+
+                        // Hide details after short delay
+                        setTimeout(() => {
+                            document.getElementById('repairDetails').classList.remove('visible');
+                            currentRepair = null;
+                        }, 2000);
+                    } else {
+                        alert('خطأ: فشل في تحديث الحالة');
+                    }
+                })
+                .withFailureHandler(function(error) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    alert('خطأ: فشل في تحديث الحالة - ' + error.message);
+                })
+                .updateRepairStatus(repairId, newStatus, '', '', '', 'QR Scanner');
+        }
+    </script>
+</body>
+</html>

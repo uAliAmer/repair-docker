@@ -1,0 +1,3103 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>لوحة تحكم الصيانة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Cairo Font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Liquid Glass Design System CSS -->
+    <link rel="stylesheet" href="liquid-glass.css">
+
+    <script src="api-client.js"></script>
+
+    <style>
+        /* ============================================================
+           PAGE-SPECIFIC STYLES FOR DASHBOARD
+           ============================================================ */
+
+        /* ============================================================
+           LAYOUT COMPONENTS
+           ============================================================ */
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            color: var(--color-text);
+            padding: var(--space-xl) var(--space-xxl);
+            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+            box-shadow: var(--shadow-glass);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-bottom: none;
+        }
+
+        .page-header h1 {
+            font-size: var(--font-size-xxl);
+            font-weight: 600;
+            font-family: Cairo;
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            letter-spacing: -0.5px;
+        }
+
+        .page-header p {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+            margin: 0;
+            text-align: center;
+        }
+
+        /* ============================================================
+           CARD COMPONENT
+           ============================================================ */
+
+        .card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: none;
+            box-shadow: var(--shadow-glass);
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-header {
+            background: rgba(0, 122, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: var(--space-md) var(--space-lg);
+            font-weight: 600;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .card-body {
+            padding: var(--space-lg);
+        }
+
+        /* ============================================================
+           FORM COMPONENTS
+           ============================================================ */
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-xs);
+        }
+
+        .form-label {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .form-input,
+        .form-select {
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            color: var(--color-text);
+            transition: all var(--transition-base);
+            border-radius: var(--radius-md);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1),
+                        0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><polygon points="0,3 12,3 6,9" fill="%231D1D1F"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right var(--space-md) center;
+            padding-right: var(--space-xl);
+            cursor: pointer;
+        }
+
+        /* ============================================================
+           BUTTON COMPONENTS
+           ============================================================ */
+
+        .button-group {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--color-text);
+            font-family: var(--font-family);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            border-radius: var(--radius-md);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .btn:hover {
+            background: rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-dark);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-accent {
+            background: var(--color-accent);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(94, 92, 230, 0.25),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-accent:hover {
+            background: #7270EA;
+            box-shadow: 0 4px 12px rgba(94, 92, 230, 0.35),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* ============================================================
+           STATUS COUNTERS
+           ============================================================ */
+
+        .status-summary-card {
+            margin-top: var(--space-lg);
+        }
+
+        .status-summary-card .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+
+        .status-summary-copy {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        .status-counters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .status-counter {
+            --counter-gradient: linear-gradient(135deg, rgba(0, 122, 255, 0.85), rgba(64, 156, 255, 0.55));
+            --counter-shadow: rgba(64, 156, 255, 0.35);
+            --counter-highlight: rgba(255, 255, 255, 0.9);
+            position: relative;
+            border-radius: var(--radius-2xl);
+            padding: 1px;
+            background: rgba(255, 255, 255, 0.35);
+            overflow: hidden;
+            transition: transform var(--transition-base), box-shadow var(--transition-base);
+        }
+
+        .status-counter::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.03));
+            mix-blend-mode: screen;
+            pointer-events: none;
+        }
+
+        .status-counter-inner {
+            position: relative;
+            background: var(--counter-gradient);
+            border-radius: calc(var(--radius-2xl) - 2px);
+            padding: var(--space-lg);
+            min-height: 150px;
+            color: var(--counter-highlight);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: var(--space-md);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
+        }
+
+        .status-counter:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 26px 55px var(--counter-shadow);
+        }
+
+        .status-counter-label {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+        }
+
+        .status-counter-label .status-chip {
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: var(--radius-md);
+            padding: 4px 10px;
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .status-counter-meta {
+            font-size: var(--font-size-xs);
+            color: rgba(255, 255, 255, 0.75);
+            letter-spacing: 0.4px;
+        }
+
+        .status-mini-counters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: calc(var(--space-xs) * 1.5);
+            margin-top: calc(var(--space-xs) * 1.5);
+        }
+
+        .mini-counter {
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: var(--radius-md);
+            padding: calc(var(--space-xs) * 1.6);
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .mini-counter-label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.95;
+            letter-spacing: 0.2px;
+        }
+
+        .mini-counter .rolling-number {
+            align-self: flex-end;
+        }
+
+        .rolling-number.mini {
+            font-size: clamp(1.35rem, 3.2vw, 1.85rem);
+            gap: 4px;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.24));
+        }
+
+        .rolling-number.mini .digit {
+            width: 0.9ch;
+            height: clamp(1.8rem, 3.8vw, 2.1rem);
+        }
+
+        .rolling-number.mini .digit-strip span {
+            height: clamp(1.8rem, 3.8vw, 2.1rem);
+        }
+
+        .status-mini-placeholder {
+            visibility: hidden;
+            min-height: 52px;
+            pointer-events: none;
+        }
+
+        .rolling-number {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            justify-content: flex-end;
+            direction: ltr;
+            font-size: clamp(2.4rem, 4vw, 3.4rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            filter: drop-shadow(0 14px 26px rgba(0, 0, 0, 0.35));
+        }
+
+        .digit {
+            width: 1ch;
+            height: clamp(2.6rem, 5vw, 3.4rem);
+            overflow: hidden;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+        }
+
+        .digit-strip {
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .digit-strip span {
+            height: clamp(2.6rem, 5vw, 3.4rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--counter-highlight);
+        }
+
+        .digit-separator {
+            width: 0.6ch;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .status-counter.empty-state {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .status-counter.empty-state .status-counter-inner {
+            background: rgba(255, 255, 255, 0.85);
+            color: var(--color-text-secondary);
+            box-shadow: none;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 120px;
+            gap: var(--space-sm);
+        }
+
+        .status-counter.empty-state::before {
+            opacity: 0;
+        }
+
+        @media (max-width: 767px) {
+            .status-summary-card {
+                margin-top: var(--space-md);
+            }
+
+            .status-counters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .status-summary-copy {
+                justify-content: center;
+                text-align: center;
+            }
+
+            .status-counter-inner {
+                min-height: 130px;
+                padding: var(--space-md);
+            }
+
+            .rolling-number {
+                justify-content: center;
+            }
+        }
+
+        /* ============================================================
+           TABLE COMPONENT
+           ============================================================ */
+
+        .table-container {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-2xl);
+            overflow-x: auto;
+            overflow-y: visible;
+            margin-top: var(--space-lg);
+            box-shadow: var(--shadow-glass);
+            -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on iOS */
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+        }
+
+        .table thead {
+            background: rgba(0, 122, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table th {
+            padding: var(--space-md);
+            text-align: center;
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            color: var(--color-text);
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+        }
+
+        .table td {
+            padding: var(--space-md);
+            text-align: center;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            font-size: var(--font-size-sm);
+            color: var(--color-text);
+        }
+
+        .table tbody tr {
+            transition: all var(--transition-base);
+            background: transparent;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(0, 122, 255, 0.05);
+            transform: scale(1.001);
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.08);
+        }
+
+        /* ============================================================
+           BADGE COMPONENT
+           ============================================================ */
+
+        .badge {
+            display: inline-block;
+            padding: var(--space-xs) var(--space-md);
+            border: 2px solid;
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .badge-success {
+            background-color: #d4edda;
+            border-color: var(--color-success);
+            color: #155724;
+        }
+
+        .badge-error {
+            background-color: #f8d7da;
+            border-color: var(--color-error);
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background-color: #fff3cd;
+            border-color: var(--color-warning);
+            color: #856404;
+        }
+
+        .badge-info {
+            background-color: #d1ecf1;
+            border-color: var(--color-info);
+            color: #0c5460;
+        }
+
+        /* ============================================================
+           STATUS INDICATORS
+           ============================================================ */
+
+        .no-data {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--color-text-muted);
+            font-size: var(--font-size-base);
+            background: var(--color-surface);
+            border: 2px dashed var(--color-border);
+            border-radius: var(--border-radius);
+        }
+
+        .loading {
+            text-align: center;
+            padding: var(--space-xl);
+            color: var(--color-text-light);
+            font-size: var(--font-size-base);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: ellipsis 1.5s infinite;
+        }
+
+        @keyframes ellipsis {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* ============================================================
+           STATUS BAR
+           ============================================================ */
+
+        .statusbar {
+            background: linear-gradient(to bottom, #dee2e6 0%, #ced4da 100%);
+            border: 2px solid var(--color-border);
+            border-top: none;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: var(--space-sm) var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .statusbar-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        /* ============================================================
+           SCROLLBAR STYLING
+           ============================================================ */
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(98, 107, 116, 0.25);
+            border-radius: var(--radius-sm);
+            transition: background var(--transition-base);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 122, 255, 0.4);
+        }
+
+        /* Glass scrollbars inside cards and tables */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.03);
+            border-radius: var(--radius-sm);
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 122, 255, 0.25);
+            border-radius: var(--radius-sm);
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 122, 255, 0.4);
+        }
+
+        /* For Firefox */
+        body,
+        .table-container {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0, 122, 255, 0.25) rgba(0, 0, 0, 0.03);
+        }
+
+        /* ============================================================
+           RESPONSIVE DESIGN - MOBILE FIRST APPROACH
+           ============================================================ */
+
+        /* Device Detection Classes */
+        body.mobile-device {
+            font-size: 16px; /* Prevent iOS zoom on input focus */
+        }
+
+        /* Base Mobile Styles (default, 400px and up) */
+        @media (max-width: 400px) {
+            :root {
+                --font-size-base: 14px;
+                --font-size-sm: 12px;
+                --font-size-lg: 15px;
+                --font-size-xl: 18px;
+                --space-xs: 3px;
+                --space-sm: 6px;
+                --space-md: 12px;
+                --space-lg: 18px;
+                --space-xl: 24px;
+            }
+
+            body {
+                padding: var(--space-xs);
+            }
+
+            .app-container {
+                padding: 0;
+            }
+
+            .page-header {
+                padding: var(--space-md);
+                border-radius: var(--border-radius-sm);
+            }
+
+            .page-header h1 {
+                font-size: 1.2rem;
+            }
+
+            .page-header p {
+                font-size: 0.75rem;
+            }
+
+            .card {
+                margin-bottom: var(--space-md);
+                border-radius: var(--border-radius-sm);
+            }
+
+            .card-header {
+                padding: var(--space-sm) var(--space-md);
+                font-size: 0.85rem;
+            }
+
+            .card-body {
+                padding: var(--space-sm);
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-sm);
+            }
+
+            .form-input,
+            .form-select {
+                padding: var(--space-sm) var(--space-md);
+                font-size: 16px; /* Prevent iOS zoom */
+                min-height: 44px; /* Touch-friendly */
+            }
+
+            .button-group {
+                flex-direction: column;
+                gap: var(--space-sm);
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                padding: var(--space-md);
+                min-height: 44px; /* Touch-friendly */
+                font-size: 0.9rem;
+            }
+
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table {
+                font-size: 0.7rem;
+            }
+
+            .table th,
+            .table td {
+                padding: var(--space-xs);
+                white-space: nowrap;
+            }
+
+            .badge {
+                font-size: 0.65rem;
+                padding: 2px var(--space-xs);
+            }
+
+            .statusbar {
+                padding: var(--space-xs) var(--space-sm);
+                font-size: 0.7rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-xs);
+            }
+        }
+
+        /* Mobile Portrait (401px to 767px) */
+        @media (min-width: 401px) and (max-width: 767px) {
+            :root {
+                --font-size-base: 14px;
+                --font-size-sm: 12px;
+                --font-size-lg: 16px;
+                --font-size-xl: 19px;
+            }
+
+            body {
+                padding: var(--space-sm);
+            }
+
+            .page-header {
+                padding: var(--space-md) var(--space-lg);
+            }
+
+            .page-header h1 {
+                font-size: 1.3rem;
+            }
+
+            .card-body {
+                padding: var(--space-md);
+            }
+
+            .filter-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-md);
+            }
+
+            .form-input,
+            .form-select {
+                min-height: 44px; /* Touch-friendly */
+                font-size: 16px; /* Prevent iOS zoom */
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px; /* Touch-friendly */
+            }
+
+            .table th,
+            .table td {
+                padding: var(--space-sm);
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Tablet Portrait (768px to 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .filter-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: var(--space-md);
+            }
+
+            .button-group {
+                justify-content: center;
+            }
+
+            .btn {
+                min-width: 140px;
+            }
+
+            .table th,
+            .table td {
+                padding: var(--space-md);
+            }
+        }
+
+        /* Tablet Landscape / Small Desktop (1024px to 1439px) */
+        @media (min-width: 1024px) and (max-width: 1439px) {
+            .app-container {
+                max-width: 1200px;
+            }
+
+            .filter-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Large Desktop (1440px and up) */
+        @media (min-width: 1440px) {
+            :root {
+                --font-size-base: 15px;
+                --font-size-lg: 17px;
+                --font-size-xl: 22px;
+            }
+
+            .app-container {
+                max-width: 1600px;
+            }
+
+            .filter-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .page-header {
+                padding: var(--space-xl);
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .card-body {
+                padding: var(--space-xl);
+            }
+        }
+
+        /* Landscape Mode Optimization for Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .page-header {
+                padding: var(--space-sm) var(--space-md);
+            }
+
+            .page-header h1 {
+                font-size: 1rem;
+            }
+
+            .page-header p {
+                display: none;
+            }
+
+            .card-header {
+                padding: var(--space-sm) var(--space-md);
+            }
+
+            .card-body {
+                padding: var(--space-sm);
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Touch-friendly tap targets */
+            .btn,
+            .form-input,
+            .form-select {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            /* Remove hover effects on touch devices */
+            .btn:hover {
+                transform: none;
+            }
+
+            /* Improve table scrolling */
+            .table-container {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Larger touch areas for interactive elements */
+            .table tbody tr {
+                cursor: pointer;
+            }
+        }
+
+        /* Smooth Transitions */
+        .app-container,
+        .card,
+        .btn,
+        .form-input,
+        .form-select {
+            transition: all var(--transition-base);
+        }
+
+        /* Prevent horizontal scroll on mobile */
+        body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* ============================================================
+           RTL SUPPORT
+           ============================================================ */
+
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        [dir="rtl"] .form-select {
+            background-position: left var(--space-sm) center;
+            padding-left: var(--space-xl);
+            padding-right: var(--space-md);
+        }
+
+        /* RTL support for Arabic branch names in tables */
+        .table td.branch-name,
+        .table th.branch-header {
+            direction: rtl;
+            text-align: right;
+        }
+
+        /* Ensure Arabic text in select options displays properly */
+        select[dir="rtl"] option {
+            direction: rtl;
+            text-align: right;
+        }
+
+        /* ============================================================
+           LOADING OVERLAY
+           ============================================================ */
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(44, 62, 80, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-content {
+            background-color: var(--color-surface);
+            padding: var(--space-xl);
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            max-width: 300px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(22, 160, 133, 0.2);
+            border-top: 4px solid var(--color-accent);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-md);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+           EDIT MODAL STYLES
+           ============================================================ */
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(44, 62, 80, 0.9);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-md);
+        }
+
+        .modal-content {
+            background-color: var(--color-surface);
+            border: 3px solid var(--color-border);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            background: linear-gradient(to bottom, #e9ecef 0%, #dee2e6 100%);
+            border-bottom: 2px solid var(--color-border);
+            padding: var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-text);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px outset var(--color-border);
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-lg);
+            font-weight: bold;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .modal-close:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .modal-close:active {
+            border-style: inset;
+        }
+
+        .modal-body {
+            padding: var(--space-lg);
+        }
+
+        .modal-footer {
+            background: #f8f9fa;
+            border-top: 2px solid var(--color-border);
+            padding: var(--space-lg);
+            display: flex;
+            gap: var(--space-md);
+            justify-content: flex-end;
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-sm);
+            text-transform: uppercase;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: var(--space-md);
+            border: 2px inset var(--color-border);
+            background: var(--color-surface);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+            border-radius: var(--border-radius-sm);
+            margin-bottom: var(--space-md);
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><polygon points="0,3 12,3 6,9" fill="%232c3e50"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right var(--space-sm) center;
+            padding-right: var(--space-xl);
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(22, 160, 133, 0.1);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-md);
+            border: 2px inset var(--color-border);
+            background: var(--color-surface);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+            border-radius: var(--border-radius-sm);
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(22, 160, 133, 0.1);
+        }
+
+        .btn-modal-cancel {
+            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--color-text);
+            border-color: var(--color-border);
+        }
+
+        .btn-modal-cancel:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .btn-edit {
+            padding: var(--space-xs) var(--space-md);
+            font-size: var(--font-size-sm);
+            min-height: auto;
+        }
+
+        /* Activity Log Styles */
+        .activity-log {
+            margin-top: var(--space-lg);
+            padding-top: var(--space-lg);
+            border-top: 2px solid var(--color-border);
+        }
+
+        .activity-log h3 {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .activity-log-list {
+            background: #f8f9fa;
+            border: 2px inset var(--color-border);
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-md);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .activity-log-item {
+            padding: var(--space-sm);
+            margin-bottom: var(--space-sm);
+            background: white;
+            border-left: 3px solid var(--color-accent);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-sm);
+            line-height: 1.5;
+        }
+
+        .activity-log-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .activity-log-timestamp {
+            font-weight: 600;
+            color: var(--color-accent);
+            margin-right: var(--space-sm);
+        }
+
+        .activity-log-empty {
+            text-align: center;
+            color: var(--color-text-muted);
+            font-style: italic;
+            padding: var(--space-lg);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(to bottom, var(--color-success) 0%, #229954 100%);
+            color: white;
+            padding: var(--space-md) var(--space-lg);
+            border: 2px outset #1e8449;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 10001;
+            display: none;
+            min-width: 300px;
+            font-weight: 600;
+            animation: slideInRight 0.3s ease-out;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        .toast.hiding {
+            animation: slideOutRight 0.3s ease-out;
+        }
+
+        /* Mobile Modal Styles */
+        @media (max-width: 767px) {
+            .modal-overlay {
+                padding: var(--space-xs);
+            }
+
+            .modal-content {
+                max-width: 100%;
+            }
+
+            .modal-header {
+                padding: var(--space-md);
+            }
+
+            .modal-body {
+                padding: var(--space-md);
+            }
+
+            .modal-footer {
+                padding: var(--space-md);
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+
+            .toast {
+                right: var(--space-sm);
+                left: var(--space-sm);
+                min-width: auto;
+            }
+        }
+
+        /* ============================================================
+           IMAGE PREVIEW & MODAL STYLES
+           ============================================================ */
+
+        /* Image Column Styles */
+        .image-cell {
+            text-align: center;
+            position: relative;
+        }
+
+        .image-icon {
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-block;
+            position: relative;
+        }
+
+        .image-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .image-icon.no-image {
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .image-icon.no-image:hover {
+            transform: none;
+        }
+
+        /* Hover Preview Container */
+        .image-preview-hover {
+            display: none;
+            position: fixed;
+            z-index: 9998;
+            background: var(--color-surface);
+            border: 3px solid var(--color-border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: var(--space-sm);
+            max-width: 400px;
+            max-height: 400px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .image-preview-hover.show {
+            display: block;
+            opacity: 1;
+        }
+
+        .image-preview-hover img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            border-radius: var(--border-radius);
+            display: block;
+        }
+
+        .image-preview-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-xl);
+            min-width: 200px;
+            min-height: 200px;
+        }
+
+        .image-preview-spinner {
+            border: 3px solid rgba(22, 160, 133, 0.2);
+            border-top: 3px solid var(--color-accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* Image Modal Styles */
+        .image-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-lg);
+            opacity: 0;
+            transition: opacity var(--transition-base);
+        }
+
+        .image-modal-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .image-modal-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: var(--color-surface);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.9);
+            transition: transform var(--transition-base);
+        }
+
+        .image-modal-overlay.show .image-modal-content {
+            transform: scale(1);
+        }
+
+        .image-modal-header {
+            background: linear-gradient(to bottom, #e9ecef 0%, #dee2e6 100%);
+            border-bottom: 2px solid var(--color-border);
+            padding: var(--space-md) var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .image-modal-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .image-modal-close {
+            background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px outset var(--color-border);
+            width: 36px;
+            height: 36px;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            font-size: var(--font-size-xl);
+            font-weight: bold;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+        }
+
+        .image-modal-close:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .image-modal-close:active {
+            border-style: inset;
+        }
+
+        .image-modal-body {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+            background: #f8f9fa;
+            position: relative;
+            overflow: auto;
+        }
+
+        .image-modal-img {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+
+        .image-modal-img.loaded {
+            display: block;
+        }
+
+        /* Modal Loading State */
+        .image-modal-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-lg);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 400px;
+            min-height: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xxl);
+        }
+
+        .image-modal-loading.hidden {
+            display: none;
+        }
+
+        .image-modal-spinner {
+            border: 6px solid rgba(22, 160, 133, 0.2);
+            border-top: 6px solid var(--color-accent);
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .image-modal-loading-text {
+            font-size: var(--font-size-lg);
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* Navigation Arrows */
+        .image-nav-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(233, 236, 239, 0.95) 100%);
+            border: 2px outset var(--color-border);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-fast);
+            box-shadow: var(--shadow-md);
+            z-index: 1;
+        }
+
+        .image-nav-arrow:hover {
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .image-nav-arrow:active {
+            border-style: inset;
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .image-nav-arrow.left {
+            left: var(--space-md);
+        }
+
+        .image-nav-arrow.right {
+            right: var(--space-md);
+        }
+
+        .image-nav-arrow.hidden {
+            display: none;
+        }
+
+        /* Image Counter */
+        .image-counter {
+            position: absolute;
+            bottom: var(--space-md);
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* RTL Support for Image Features */
+        [dir="rtl"] .image-nav-arrow.left {
+            left: auto;
+            right: var(--space-md);
+        }
+
+        [dir="rtl"] .image-nav-arrow.right {
+            right: auto;
+            left: var(--space-md);
+        }
+
+        /* Mobile Image Modal Styles */
+        @media (max-width: 767px) {
+            .image-modal-overlay {
+                padding: 0;
+            }
+
+            .image-modal-content {
+                max-width: 100vw;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .image-modal-header {
+                padding: var(--space-sm) var(--space-md);
+            }
+
+            .image-modal-title {
+                font-size: var(--font-size-base);
+            }
+
+            .image-modal-body {
+                padding: var(--space-sm);
+            }
+
+            .image-modal-loading {
+                min-width: 280px;
+                min-height: 280px;
+                padding: var(--space-xl);
+            }
+
+            .image-modal-spinner {
+                width: 60px;
+                height: 60px;
+                border-width: 5px;
+            }
+
+            .image-nav-arrow {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+
+            .image-nav-arrow.left {
+                left: var(--space-sm);
+            }
+
+            .image-nav-arrow.right {
+                right: var(--space-sm);
+            }
+
+            .image-preview-hover {
+                max-width: 90vw;
+                max-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>📊 لوحة تحكم حالة الصيانة</h1>
+            <p>البحث وعرض جميع سجلات الصيانة</p>
+        </div>
+
+        <!-- Status Summary -->
+        <div class="card status-summary-card">
+            <div class="card-header">
+                ⚡️ نظرة سريعة على الحالات
+            </div>
+            <div class="card-body">
+                <div class="status-summary-copy">
+                    <span>يتم تحديث هذه العدادات بحسب السجلات المعروضة حالياً.</span>
+                </div>
+                <div class="status-counters-grid" id="statusCounters">
+                    <div class="status-counter empty-state">
+                        <div class="status-counter-inner">
+                            <div class="status-counter-label">ابدأ بالبحث لعرض أعداد الحالات.</div>
+                            <div class="status-counter-meta">سيتم تشغيل حركة العدّ فور توفر البيانات.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Card -->
+        <div class="card">
+            <!-- Search Filters -->
+            <div class="card-header">
+                🔍 معايير البحث
+            </div>
+            <div class="card-body">
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label for="filterCustomer" class="form-label">👤 اسم العميل</label>
+                        <input type="text" id="filterCustomer" class="form-input" placeholder="مثال: فادي زهير">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterPhone" class="form-label">📱 رقم الهاتف</label>
+                        <input type="text" id="filterPhone" class="form-input" placeholder="مثال: 7745557861">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterDevice" class="form-label">📱 الجهاز</label>
+                        <input type="text" id="filterDevice" class="form-input" placeholder="مثال: 5-22">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterBranch" class="form-label">🏢 الفرع</label>
+                        <select id="filterBranch" class="form-select" dir="rtl">
+                            <option value="">جميع الفروع</option>
+                            <option value="عكد النصارى">عكد النصارى</option>
+                            <option value="بابلون مول">بابلون مول</option>
+                            <option value="كم سارة">كم سارة</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filterWarranty" class="form-label">🛡️ الضمان</label>
+                        <select id="filterWarranty" class="form-select">
+                            <option value="">الكل</option>
+                            <option value="Yes">نعم</option>
+                            <option value="No">لا</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filterRepairStatus" class="form-label">⚙️ حالة الصيانة</label>
+                        <select id="filterRepairStatus" class="form-select">
+                            <option value="">جميع الحالات</option>
+                            <option value="Pending">قيد الانتظار</option>
+                            <option value="In Progress">قيد التنفيذ</option>
+                            <option value="Completed">مكتمل</option>
+                            <option value="Delivered">تم التسليم</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filterDateFrom" class="form-label">📅 التاريخ من</label>
+                        <input type="date" id="filterDateFrom" class="form-input">
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="searchRepairs()">🔍 بحث</button>
+                    <button class="btn btn-accent" onclick="resetFilters()">🔄 مسح الكل</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="table-container">
+            <table id="repairsTable" class="table" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>🖼️ الصورة</th>
+                        <th>🆔 المعرف</th>
+                        <th>👤 العميل</th>
+                        <th>📱 الهاتف</th>
+                        <th>📱 الجهاز</th>
+                        <th class="branch-header">🏢 الفرع</th>
+                        <th>🔧 المشكلة</th>
+                        <th>📅 التاريخ</th>
+                        <th>🛡️ الضمان</th>
+                        <th>💰 التكلفة المقدرة</th>
+                        <th>⚙️ الحالة</th>
+                        <th>📅 تاريخ الإرجاع</th>
+                        <th>🏦 مركز التكلفة</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <div id="noData" class="no-data">
+                انقر على "بحث" لتحميل سجلات الصيانة (يعرض آخر 50 سجل)
+            </div>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="statusbar">
+            <div class="statusbar-item">
+                <span>✅ جاهز</span>
+            </div>
+            <div class="statusbar-item">
+                <span id="resultsInfo"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h3>جارٍ تحميل بيانات الصيانة...</h3>
+            <p style="margin-top: var(--space-sm); color: var(--color-text-muted);">يرجى الانتظار بينما نقوم بجلب سجلات الصيانة</p>
+        </div>
+    </div>
+
+    <!-- Image Hover Preview -->
+    <div class="image-preview-hover" id="imagePreviewHover">
+        <div class="image-preview-loading">
+            <div class="image-preview-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="image-modal-overlay" id="imageModal">
+        <div class="image-modal-content">
+            <div class="image-modal-header">
+                <h2 class="image-modal-title" id="imageModalTitle">
+                    🖼️ صورة الصيانة
+                </h2>
+                <button class="image-modal-close" onclick="closeImageModal()">✕</button>
+            </div>
+            <div class="image-modal-body">
+                <div class="image-modal-loading" id="imageModalLoading">
+                    <div class="image-modal-spinner"></div>
+                    <p class="image-modal-loading-text">جارٍ تحميل الصورة...</p>
+                </div>
+                <img class="image-modal-img" id="imageModalImg" src="" alt="صورة الصيانة">
+                <div class="image-nav-arrow left hidden" id="imagePrevBtn" onclick="navigateImage(-1)">‹</div>
+                <div class="image-nav-arrow right hidden" id="imageNextBtn" onclick="navigateImage(1)">›</div>
+                <div class="image-counter hidden" id="imageCounter">1 / 1</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Apply RTL mode by default for Arabic
+        document.body.classList.add('rtl-mode');
+
+        let allRepairs = [];
+        let searchTimeout = null;
+
+        const COUNTER_THEMES = [
+            {
+                gradient: 'linear-gradient(135deg, rgba(10, 132, 255, 0.9), rgba(64, 156, 255, 0.65))',
+                shadow: 'rgba(64, 156, 255, 0.45)',
+                highlight: 'rgba(255, 255, 255, 0.95)'
+            },
+            {
+                gradient: 'linear-gradient(135deg, rgba(94, 92, 230, 0.9), rgba(137, 129, 220, 0.6))',
+                shadow: 'rgba(94, 92, 230, 0.45)',
+                highlight: 'rgba(247, 245, 255, 0.95)'
+            },
+            {
+                gradient: 'linear-gradient(135deg, rgba(255, 159, 67, 0.9), rgba(255, 204, 92, 0.7))',
+                shadow: 'rgba(255, 159, 67, 0.4)',
+                highlight: 'rgba(255, 249, 235, 0.95)'
+            },
+            {
+                gradient: 'linear-gradient(135deg, rgba(29, 233, 182, 0.9), rgba(16, 196, 162, 0.6))',
+                shadow: 'rgba(16, 196, 162, 0.45)',
+                highlight: 'rgba(240, 254, 250, 0.95)'
+            },
+            {
+                gradient: 'linear-gradient(135deg, rgba(255, 94, 98, 0.9), rgba(255, 114, 132, 0.65))',
+                shadow: 'rgba(255, 94, 98, 0.45)',
+                highlight: 'rgba(255, 240, 240, 0.95)'
+            },
+            {
+                gradient: 'linear-gradient(135deg, rgba(116, 185, 255, 0.9), rgba(162, 155, 254, 0.65))',
+                shadow: 'rgba(116, 185, 255, 0.4)',
+                highlight: 'rgba(245, 247, 255, 0.95)'
+            }
+        ];
+
+        const statusThemeMap = new Map();
+
+        const STATUS_GROUPS = [
+            {
+                key: 'branch_received',
+                label: 'مستلم في الافرع',
+                statuses: [
+                    'تم استلام في عكد النصارى',
+                    'تم استلام في كمب سارة',
+                    'تم استلام في بابلون مول'
+                ],
+                miniLabelMap: {
+                    'تم استلام في عكد النصارى': 'عكد النصارى',
+                    'تم استلام في كمب سارة': 'كمب سارة',
+                    'تم استلام في بابلون مول': 'بابلون مول'
+                }
+            },
+            {
+                key: 'center_workflow',
+                label: 'داخل مركز الصيانة',
+                statuses: [
+                    'تم استلام في مركز الصيانة',
+                    'قيد الصيانة حاليا'
+                ],
+                miniLabelMap: {
+                    'تم استلام في مركز الصيانة': 'استلام المركز',
+                    'قيد الصيانة حاليا': 'قيد الصيانة'
+                }
+            },
+            {
+                key: 'post_repair',
+                label: 'نتائج الصيانة',
+                statuses: [
+                    'مكتمل الصيانة',
+                    'غير قابل للصيانة'
+                ],
+                miniLabelMap: {
+                    'مكتمل الصيانة': 'مكتمل',
+                    'غير قابل للصيانة': 'غير قابل'
+                }
+            }
+        ];
+
+        const STATUS_DISPLAY_ORDER = [
+            'branch_received',
+            'center_workflow',
+            'post_repair',
+            'جاهز للاستلام',
+            'تم استلام من قبل الزبون'
+        ];
+
+        function normalizeStatusLabel(label) {
+            return (label || '').toString().trim().toLowerCase();
+        }
+
+        function renderStatusCounterEmptyState(message = 'لا توجد بيانات لعرضها حتى الآن.') {
+            const container = document.getElementById('statusCounters');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="status-counter empty-state">
+                    <div class="status-counter-inner">
+                        <div class="status-counter-label">${message}</div>
+                        <div class="status-counter-meta">سيتم تشغيل حركة العدّ فور توفر البيانات.</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getThemeForStatus(statusKey) {
+            const key = statusKey || 'default';
+            if (!statusThemeMap.has(key)) {
+                const theme = COUNTER_THEMES[statusThemeMap.size % COUNTER_THEMES.length];
+                statusThemeMap.set(key, theme);
+            }
+            return statusThemeMap.get(key);
+        }
+
+        function ensureDigitContainers(wrapper, digitCount) {
+            if (!wrapper) return;
+            const existing = wrapper.querySelectorAll('.digit');
+            const diff = digitCount - existing.length;
+
+            if (diff > 0) {
+                for (let i = 0; i < diff; i++) {
+                    const digit = document.createElement('div');
+                    digit.className = 'digit';
+
+                    const strip = document.createElement('div');
+                    strip.className = 'digit-strip';
+                    for (let d = 0; d <= 9; d++) {
+                        const span = document.createElement('span');
+                        span.textContent = d;
+                        strip.appendChild(span);
+                    }
+
+                    digit.appendChild(strip);
+                    wrapper.appendChild(digit);
+                }
+            } else if (diff < 0) {
+                for (let i = 0; i < Math.abs(diff); i++) {
+                    if (wrapper.firstElementChild) {
+                        wrapper.removeChild(wrapper.firstElementChild);
+                    }
+                }
+            }
+        }
+
+        function buildCounterData(source) {
+            if (!Array.isArray(source) || source.length === 0) {
+                return [];
+            }
+
+            const firstItem = source[0];
+            const appearsPreAggregated = firstItem && typeof firstItem === 'object'
+                && Object.prototype.hasOwnProperty.call(firstItem, 'count')
+                && Object.prototype.hasOwnProperty.call(firstItem, 'label');
+
+            if (appearsPreAggregated) {
+                return source
+                    .map(item => {
+                        const label = (item.label || item.status || '').toString().trim();
+                        const count = Number(item.count) || 0;
+                        const keySource = label ? label : (item.key || item.status || '');
+                        return {
+                            key: keySource.toString().trim().toLowerCase(),
+                            label,
+                            count
+                        };
+                    })
+                    .filter(entry => entry.label && entry.count >= 0);
+            }
+
+            const countsMap = new Map();
+
+            source.forEach(repair => {
+                const rawStatus = (repair.repairStatus || repair.status || '').toString().trim();
+                if (!rawStatus) return;
+
+                const normalizedKey = rawStatus.toLowerCase();
+                if (!countsMap.has(normalizedKey)) {
+                    countsMap.set(normalizedKey, { key: normalizedKey, label: rawStatus, count: 0 });
+                }
+                countsMap.get(normalizedKey).count += 1;
+            });
+
+            return Array.from(countsMap.values());
+        }
+
+        function groupCounterEntries(counterData) {
+            if (!Array.isArray(counterData) || counterData.length === 0) {
+                return [];
+            }
+
+            const dataByLabel = new Map();
+            counterData.forEach(item => {
+                dataByLabel.set(normalizeStatusLabel(item.label), item);
+            });
+
+            const consumed = new Set();
+            const groupedEntries = [];
+
+            STATUS_GROUPS.forEach(group => {
+                const miniCounters = group.statuses.map(statusLabel => {
+                    const normalized = normalizeStatusLabel(statusLabel);
+                    const existing = dataByLabel.get(normalized);
+                    if (existing) {
+                        consumed.add(normalized);
+                    }
+                    return {
+                        key: existing ? existing.key : normalized,
+                        statusLabel,
+                        label: group.miniLabelMap?.[statusLabel] || statusLabel,
+                        count: existing ? existing.count : 0
+                    };
+                });
+
+                const totalCount = miniCounters.reduce((sum, mini) => sum + mini.count, 0);
+
+                groupedEntries.push({
+                    key: group.key,
+                    label: group.label,
+                    count: totalCount,
+                    miniCounters
+                });
+            });
+
+            const remainingEntries = counterData
+                .filter(entry => !consumed.has(normalizeStatusLabel(entry.label)))
+                .sort((a, b) => {
+                    if (b.count !== a.count) return b.count - a.count;
+                    return a.label.localeCompare(b.label, 'ar');
+                });
+
+            return groupedEntries.concat(remainingEntries);
+        }
+
+        function getDisplayIndex(entry) {
+            const orderNormalized = STATUS_DISPLAY_ORDER.map(item => normalizeStatusLabel(item));
+            const normalizedKey = normalizeStatusLabel(entry.key || '');
+            const normalizedLabel = normalizeStatusLabel(entry.label || '');
+
+            const keyIndex = orderNormalized.indexOf(normalizedKey);
+            if (keyIndex !== -1) return keyIndex;
+
+            const labelIndex = orderNormalized.indexOf(normalizedLabel);
+            if (labelIndex !== -1) return labelIndex;
+
+            return orderNormalized.length + 1;
+        }
+
+        function animateRollingNumber(wrapper, value) {
+            if (!wrapper) return;
+
+            const targetValue = Math.max(0, Math.round(Number(value) || 0));
+            const stringValue = targetValue.toString();
+
+            ensureDigitContainers(wrapper, stringValue.length);
+
+            const strips = wrapper.querySelectorAll('.digit-strip');
+            const padded = stringValue.padStart(strips.length, '0');
+
+            padded.split('').forEach((digitChar, index) => {
+                const strip = strips[index];
+                const digitValue = parseInt(digitChar, 10);
+                requestAnimationFrame(() => {
+                    strip.style.transform = `translateY(-${digitValue * 100}%)`;
+                });
+            });
+
+            wrapper.dataset.currentValue = targetValue;
+        }
+
+        function updateStatusCounters(repairs, emptyMessage) {
+            const container = document.getElementById('statusCounters');
+            if (!container) return;
+
+            const counterData = buildCounterData(repairs);
+            const groupedData = groupCounterEntries(counterData);
+
+            if (groupedData.length === 0) {
+                renderStatusCounterEmptyState(emptyMessage || 'لا توجد حالات لعرضها.');
+                return;
+            }
+
+            const orderedData = groupedData.slice().sort((a, b) => {
+                const indexA = getDisplayIndex(a);
+                const indexB = getDisplayIndex(b);
+                if (indexA !== indexB) return indexA - indexB;
+                if (b.count !== a.count) return b.count - a.count;
+                return a.label.localeCompare(b.label, 'ar');
+            });
+
+            container.innerHTML = '';
+
+            orderedData.forEach(entry => {
+                const counter = document.createElement('div');
+                counter.className = 'status-counter';
+
+                const theme = getThemeForStatus(entry.key);
+                counter.style.setProperty('--counter-gradient', theme.gradient);
+                counter.style.setProperty('--counter-shadow', theme.shadow);
+                counter.style.setProperty('--counter-highlight', theme.highlight);
+
+                const hasMiniCounters = Array.isArray(entry.miniCounters) && entry.miniCounters.length > 0;
+                const miniMarkup = hasMiniCounters
+                    ? `
+                        <div class="status-mini-counters">
+                            ${entry.miniCounters.map(mini => `
+                                <div class="mini-counter">
+                                    <div class="mini-counter-label">${mini.label}</div>
+                                    <div class="rolling-number mini" data-mini-status="${normalizeStatusLabel(mini.statusLabel)}" data-current-value="0"></div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `
+                    : '<div class="status-mini-placeholder"></div>';
+
+                counter.innerHTML = `
+                    <div class="status-counter-inner">
+                        <div class="status-counter-label">${entry.label}</div>
+                        <div class="rolling-number" data-current-value="0"></div>
+                        ${miniMarkup}
+                    </div>
+                `;
+
+                container.appendChild(counter);
+
+                const numberWrapper = counter.querySelector('.rolling-number');
+                ensureDigitContainers(numberWrapper, 1);
+
+                setTimeout(() => {
+                    animateRollingNumber(numberWrapper, entry.count);
+                }, 30);
+
+                if (hasMiniCounters) {
+                    entry.miniCounters.forEach((mini, index) => {
+                        const miniWrapper = counter.querySelector(`.rolling-number.mini[data-mini-status="${normalizeStatusLabel(mini.statusLabel)}"]`);
+                        if (!miniWrapper) return;
+                        ensureDigitContainers(miniWrapper, 1);
+                        setTimeout(() => {
+                            animateRollingNumber(miniWrapper, mini.count);
+                        }, 80 + (index * 40));
+                    });
+                }
+            });
+        }
+
+        async function loadInitialStatusCounters() {
+            renderStatusCounterEmptyState('جارٍ تحميل عدادات الحالات...');
+
+            let summary = null;
+
+            try {
+                summary = await api.getStatusCounts();
+            } catch (error) {
+                console.error('Status counters load error:', error);
+            }
+
+            if (summary && summary.length > 0) {
+                updateStatusCounters(summary, 'لا توجد بيانات لعرضها حالياً.');
+                return;
+            }
+
+            // Fallback: derive counters from latest repair list to avoid empty state on mobile
+            try {
+                const repairs = await api.getAllRepairs();
+
+                if (Array.isArray(repairs) && repairs.length > 0) {
+                    updateStatusCounters(repairs, 'لا توجد بيانات لعرضها حالياً.');
+                    return;
+                }
+            } catch (fallbackError) {
+                console.error('Status counters fallback error:', fallbackError);
+            }
+
+            renderStatusCounterEmptyState('تعذر تحميل العدادات. حاول مرة أخرى لاحقاً.');
+        }
+
+        function normalizePhone(input) {
+            if (!input) return '';
+            return input.replace(/[\s\-\(\)]/g, '');
+        }
+
+        function normalizeArabic(text) {
+            if (!text) return '';
+            let normalized = text.replace(/[\u064B-\u0652]/g, '');
+            normalized = normalized.replace(/[أإآ]/g, 'ا');
+            normalized = normalized.replace(/ة/g, 'ه');
+            return normalized;
+        }
+
+        function matchesSearch(repair, searchTerm, fieldName) {
+            if (!searchTerm) return true;
+
+            // Handle customerName field for Docker version compatibility
+            let value = repair[fieldName] || '';
+            if (fieldName === 'customer' && !value) {
+                value = repair.customerName || '';
+            }
+            const searchLower = searchTerm.toLowerCase();
+
+            if (fieldName === 'phone') {
+                return normalizePhone(value).includes(normalizePhone(searchTerm));
+            }
+
+            const normalMatch = value.toLowerCase().includes(searchLower);
+            const arabicMatch = normalizeArabic(value).includes(normalizeArabic(searchTerm));
+
+            return normalMatch || arabicMatch;
+        }
+
+        function onSearchInput() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (allRepairs.length > 0) {
+                    performSearch();
+                }
+            }, 500);
+        }
+
+        function getStatusClass(status) {
+            if (!status) return 'badge-warning';
+            const statusLower = status.toLowerCase();
+            if (statusLower.includes('pending')) return 'badge-warning';
+            if (statusLower.includes('progress')) return 'badge-info';
+            if (statusLower.includes('completed')) return 'badge-success';
+            if (statusLower.includes('delivered')) return 'badge-success';
+            return 'badge-warning';
+        }
+
+        function displayRepairs(data) {
+            allRepairs = data;
+            document.getElementById('loadingOverlay').style.display = 'none';
+
+            if (!data || data.length === 0) {
+                document.getElementById('noData').style.display = 'block';
+                document.getElementById('repairsTable').style.display = 'none';
+                document.getElementById('resultsInfo').textContent = 'لم يتم العثور على صيانات';
+                updateStatusCounters([], 'لم يتم العثور على صيانات ضمن النتائج الحالية.');
+                return;
+            }
+
+            const maxRecords = 50;
+            const startIndex = Math.max(0, data.length - maxRecords);
+            const displayData = data.slice(startIndex).reverse();
+
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            displayData.forEach((repair, index) => {
+                const row = document.createElement('tr');
+
+                // Create image icon - prioritize base64 data like QRScanner
+                // Process image URL to handle base64 and Google Drive URL conversion
+                const imageSource = processImageUrl(repair);
+                const hasImage = imageSource.trim() !== '';
+                const imageIcon = hasImage
+                    ? `<svg class="image-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         onmouseenter="showImagePreview(event, '${imageSource.replace(/'/g, "\\'")}', '${repair.repairId || ''}')"
+                         onmouseleave="hideImagePreview()"
+                         onclick="openImageModal('${imageSource.replace(/'/g, "\\'")}', '${repair.repairId || ''}', '${repair.device || ''}')">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                       </svg>`
+                    : `<svg class="image-icon no-image" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="3" x2="21" y2="21"></line>
+                       </svg>`;
+
+                row.innerHTML = `
+                    <td class="image-cell">${imageIcon}</td>
+                    <td>${repair.repairId || repair.id || ''}</td>
+                    <td>${repair.customerName || repair.customer || ''}</td>
+                    <td>${repair.phone || ''}</td>
+                    <td>${repair.device || ''}</td>
+                    <td class="branch-name">${repair.branch || ''}</td>
+                    <td>${repair.issue || ''}</td>
+                    <td>${repair.date || ''}</td>
+                    <td><span class="badge ${repair.warranty === 'Yes' ? 'badge-success' : 'badge-error'}">${repair.warranty || ''}</span></td>
+                    <td>${repair.estimatedCost || ''}</td>
+                    <td><span class="badge ${getStatusClass(repair.repairStatus || '')}">${repair.repairStatus || ''}</span></td>
+                    <td>${repair.returnDate || ''}</td>
+                    <td>${repair.costCenter || ''}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('repairsTable').style.display = 'table';
+            document.getElementById('noData').style.display = 'none';
+
+            if (data.length > maxRecords) {
+                document.getElementById('resultsInfo').textContent = `تم العثور على ${data.length} صيانة (عرض آخر ${displayData.length})`;
+            } else {
+                document.getElementById('resultsInfo').textContent = `تم العثور على ${displayData.length} صيانة`;
+            }
+
+            updateStatusCounters(displayData);
+        }
+
+        function performSearch() {
+            if (allRepairs.length === 0) {
+                searchRepairs();
+                return;
+            }
+
+            const customer = document.getElementById('filterCustomer').value;
+            const phone = document.getElementById('filterPhone').value;
+            const device = document.getElementById('filterDevice').value;
+            const branch = document.getElementById('filterBranch').value;
+            const warranty = document.getElementById('filterWarranty').value;
+            const repairStatus = document.getElementById('filterRepairStatus').value;
+            const dateFrom = document.getElementById('filterDateFrom').value;
+
+            const filtered = allRepairs.filter(repair => {
+                const customerMatch = matchesSearch(repair, customer, 'customer');
+                const phoneMatch = matchesSearch(repair, phone, 'phone');
+                const deviceMatch = matchesSearch(repair, device, 'device');
+                const branchMatch = branch === '' || repair.branch.toLowerCase() === branch.toLowerCase();
+                const warrantyMatch = warranty === '' || repair.warranty.toLowerCase() === warranty.toLowerCase();
+                const repairStatusMatch = repairStatus === '' || repair.repairStatus.toLowerCase() === repairStatus.toLowerCase();
+
+                let dateMatch = true;
+                if (dateFrom !== '') {
+                    const repairDate = new Date(repair.date);
+                    const filterDate = new Date(dateFrom);
+                    dateMatch = repairDate >= filterDate;
+                }
+
+                return customerMatch && phoneMatch && deviceMatch && branchMatch && warrantyMatch && repairStatusMatch && dateMatch;
+            });
+
+            displayFilteredResults(filtered);
+        }
+
+        function displayFilteredResults(filtered) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                document.getElementById('noData').style.display = 'block';
+                document.getElementById('repairsTable').style.display = 'none';
+                document.getElementById('resultsInfo').textContent = 'لا توجد صيانات تطابق معايير البحث';
+                updateStatusCounters([], 'لا توجد حالات ضمن المرشحات الحالية.');
+                return;
+            }
+
+            const maxRecords = 50;
+            const startIndex = Math.max(0, filtered.length - maxRecords);
+            const displayData = filtered.slice(startIndex).reverse();
+
+            displayData.forEach((repair, index) => {
+                const row = document.createElement('tr');
+
+                // Create image icon - prioritize base64 data like QRScanner
+                // Process image URL to handle base64 and Google Drive URL conversion
+                const imageSource = processImageUrl(repair);
+                const hasImage = imageSource.trim() !== '';
+                const imageIcon = hasImage
+                    ? `<svg class="image-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                         onmouseenter="showImagePreview(event, '${imageSource.replace(/'/g, "\\'")}', '${repair.repairId || ''}')"
+                         onmouseleave="hideImagePreview()"
+                         onclick="openImageModal('${imageSource.replace(/'/g, "\\'")}', '${repair.repairId || ''}', '${repair.device || ''}')">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                       </svg>`
+                    : `<svg class="image-icon no-image" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="3" x2="21" y2="21"></line>
+                       </svg>`;
+
+                row.innerHTML = `
+                    <td class="image-cell">${imageIcon}</td>
+                    <td>${repair.repairId || repair.id || ''}</td>
+                    <td>${repair.customerName || repair.customer || ''}</td>
+                    <td>${repair.phone || ''}</td>
+                    <td>${repair.device || ''}</td>
+                    <td class="branch-name">${repair.branch || ''}</td>
+                    <td>${repair.issue || ''}</td>
+                    <td>${repair.date || ''}</td>
+                    <td><span class="badge ${repair.warranty === 'Yes' ? 'badge-success' : 'badge-error'}">${repair.warranty || ''}</span></td>
+                    <td>${repair.estimatedCost || ''}</td>
+                    <td><span class="badge ${getStatusClass(repair.repairStatus || '')}">${repair.repairStatus || ''}</span></td>
+                    <td>${repair.returnDate || ''}</td>
+                    <td>${repair.costCenter || ''}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            document.getElementById('repairsTable').style.display = 'table';
+            document.getElementById('noData').style.display = 'none';
+
+            if (filtered.length > maxRecords) {
+                document.getElementById('resultsInfo').textContent = `تم العثور على ${filtered.length} صيانة (عرض آخر ${displayData.length})`;
+            } else {
+                document.getElementById('resultsInfo').textContent = `تم العثور على ${filtered.length} صيانة`;
+            }
+
+            updateStatusCounters(displayData);
+        }
+
+        async function searchRepairs() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            document.getElementById('repairsTable').style.display = 'none';
+            document.getElementById('resultsInfo').textContent = 'جارٍ البحث...';
+
+            try {
+                const data = await api.getAllRepairs();
+                allRepairs = data;
+                document.getElementById('loadingOverlay').style.display = 'none';
+                performSearch();
+            } catch (error) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                console.error('Error:', error);
+                alert('خطأ في تحميل البيانات: ' + error.message);
+                document.getElementById('resultsInfo').textContent = 'خطأ: ' + error.message;
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('filterCustomer').value = '';
+            document.getElementById('filterPhone').value = '';
+            document.getElementById('filterDevice').value = '';
+            document.getElementById('filterBranch').value = '';
+            document.getElementById('filterWarranty').value = '';
+            document.getElementById('filterRepairStatus').value = '';
+            document.getElementById('filterDateFrom').value = '';
+
+            document.getElementById('repairsTable').style.display = 'none';
+            document.getElementById('noData').style.display = 'block';
+            document.getElementById('resultsInfo').textContent = 'تم مسح التصفيات';
+            allRepairs = [];
+            clearTimeout(searchTimeout);
+
+            loadInitialStatusCounters();
+        }
+
+        // ============================================================
+        // DEVICE DETECTION & RESPONSIVE UTILITIES
+        // ============================================================
+
+        function detectDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+            const isTablet = /(ipad|tablet|(android(?!.*mobile))|(windows(?!.*phone)(.*touch))|kindle|playbook|silk|(puffin(?!.*(IP|AP|WP))))/.test(userAgent.toLowerCase());
+            const screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+
+            // Determine device type based on multiple factors
+            if (isMobile || (screenWidth < 768 && isTouchDevice)) {
+                document.body.classList.add('mobile-device');
+                document.body.classList.remove('desktop-device');
+                return 'mobile';
+            } else if (isTablet || (screenWidth >= 768 && screenWidth < 1024 && isTouchDevice)) {
+                document.body.classList.add('mobile-device'); // Tablets use mobile layout
+                document.body.classList.remove('desktop-device');
+                return 'tablet';
+            } else {
+                document.body.classList.add('desktop-device');
+                document.body.classList.remove('mobile-device');
+                return 'desktop';
+            }
+        }
+
+        // Apply responsive viewport height fix for mobile browsers
+        function applyViewportFix() {
+            const setVH = () => {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+
+            setVH();
+            window.addEventListener('resize', setVH);
+            window.addEventListener('orientationchange', setVH);
+        }
+
+        // Log device info for debugging
+        function logDeviceInfo() {
+            const deviceType = detectDevice();
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            const pixelRatio = window.devicePixelRatio || 1;
+
+            console.log('🔧 Repair Tracker - Device Info:');
+            console.log('  Device Type:', deviceType);
+            console.log('  Screen Size:', `${screenWidth}x${screenHeight}`);
+            console.log('  Pixel Ratio:', pixelRatio);
+            console.log('  Touch Support:', ('ontouchstart' in window) ? 'Yes' : 'No');
+            console.log('  User Agent:', navigator.userAgent);
+        }
+
+        window.onload = function() {
+            // Initialize responsive features
+            detectDevice();
+            applyViewportFix();
+            logDeviceInfo();
+            loadInitialStatusCounters();
+
+            const textInputs = ['filterCustomer', 'filterPhone', 'filterDevice'];
+            textInputs.forEach(filterId => {
+                const element = document.getElementById(filterId);
+                if (element) {
+                    element.addEventListener('input', onSearchInput);
+                    element.addEventListener('keypress', function(event) {
+                        if (event.key === 'Enter') {
+                            event.preventDefault();
+                            clearTimeout(searchTimeout);
+                            if (allRepairs.length > 0) {
+                                performSearch();
+                            } else {
+                                searchRepairs();
+                            }
+                        }
+                    });
+                }
+            });
+
+            const dropdowns = ['filterBranch', 'filterWarranty', 'filterRepairStatus'];
+            dropdowns.forEach(filterId => {
+                const element = document.getElementById(filterId);
+                if (element) {
+                    element.addEventListener('change', function() {
+                        if (allRepairs.length > 0) {
+                            performSearch();
+                        }
+                    });
+                }
+            });
+
+            const dateField = document.getElementById('filterDateFrom');
+            if (dateField) {
+                dateField.addEventListener('change', function() {
+                    if (allRepairs.length > 0) {
+                        performSearch();
+                    }
+                });
+            }
+
+            // Re-detect device on window resize
+            window.addEventListener('resize', () => {
+                detectDevice();
+            });
+
+            // Handle orientation changes smoothly
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    detectDevice();
+                    applyViewportFix();
+                }, 100);
+            });
+
+            // Event delegation for edit buttons
+            document.addEventListener('click', function(event) {
+                const editBtn = event.target.closest('.btn-edit');
+                if (editBtn) {
+                    const repairId = editBtn.getAttribute('data-repair-id');
+                    if (repairId) {
+                        // Find repair in allRepairs array by id
+                        const repair = allRepairs.find(r => r.id === repairId);
+                        if (repair) {
+                            openEditModal(repair);
+                        } else {
+                            console.error('Repair not found with id:', repairId);
+                            showToast('خطأ: لم يتم العثور على سجل الصيانة', 'error');
+                        }
+                    }
+                }
+            });
+        };
+
+        // ============================================================
+        // EDIT MODAL FUNCTIONS
+        // ============================================================
+
+        let currentEditingRepair = null;
+
+        function openEditModal(repair) {
+            currentEditingRepair = repair;
+
+            // Populate repair ID
+            document.getElementById('editRepairId').value = repair.repairId || '';
+
+            // Set status - match Arabic status or default to first option
+            const statusSelect = document.getElementById('editStatus');
+            statusSelect.value = repair.repairStatus || '';
+            if (statusSelect.selectedIndex === -1) {
+                statusSelect.selectedIndex = 0;
+            }
+
+            // Set cost
+            const costValue = (repair.estimatedCost || '').toString().replace(/[^\d.]/g, '');
+            document.getElementById('editCost').value = costValue;
+
+            // Set branch
+            const branchSelect = document.getElementById('editBranch');
+            branchSelect.value = repair.branch || '';
+            if (branchSelect.selectedIndex === -1) {
+                branchSelect.selectedIndex = 0;
+            }
+
+            // Clear notes field
+            document.getElementById('editNotes').value = '';
+
+            // Display activity log
+            displayActivityLog(repair.history || []);
+
+            // Show modal
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditingRepair = null;
+        }
+
+        function displayActivityLog(history) {
+            const logList = document.getElementById('activityLogList');
+
+            // Check if history is provided and is an array
+            if (!history || !Array.isArray(history) || history.length === 0) {
+                logList.innerHTML = '<div class="activity-log-empty">لم يتم تسجيل أي نشاط بعد</div>';
+                return;
+            }
+
+            logList.innerHTML = '';
+
+            // Display history entries (newest first)
+            history.forEach(entry => {
+                const item = document.createElement('div');
+                item.className = 'activity-log-item';
+
+                // Format timestamp
+                const timestamp = formatHistoryTimestamp(entry.timestamp);
+                const action = entry.action || '';
+                const user = entry.user || 'غير معروف';
+                const notes = entry.notes || '';
+
+                // Build HTML content
+                let html = `<div style="margin-bottom: 4px;"><span class="activity-log-timestamp">📅 ${timestamp}</span></div>`;
+                html += `<div style="margin-bottom: 4px;"><strong>🏷️ ${action}</strong></div>`;
+                html += `<div style="margin-bottom: 4px; color: var(--color-text-secondary);">🧑‍🔧 بواسطة: ${user}</div>`;
+
+                if (notes) {
+                    html += `<div style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">📝 ${notes}</div>`;
+                }
+
+                item.innerHTML = html;
+                logList.appendChild(item);
+            });
+        }
+
+        function formatHistoryTimestamp(isoString) {
+            try {
+                const date = new Date(isoString);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}`;
+            } catch (e) {
+                return isoString;
+            }
+        }
+
+        async function saveRepairEdit() {
+            if (!currentEditingRepair) {
+                showToast('خطأ: لم يتم تحديد صيانة', 'error');
+                return;
+            }
+
+            const repairId = currentEditingRepair.id; // Use the actual database ID
+            const newStatus = document.getElementById('editStatus').value;
+            const cost = document.getElementById('editCost').value.trim();
+            const branch = document.getElementById('editBranch').value.trim();
+            const notes = document.getElementById('editNotes').value.trim();
+
+            if (!newStatus) {
+                showToast('الرجاء اختيار حالة', 'error');
+                return;
+            }
+
+            // Close modal and show loading
+            closeEditModal();
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            // Get current user
+            const user = api.getCurrentUser();
+            const updatedBy = user ? user.username : 'موظف';
+
+            // Call API to update repair
+            try {
+                const statusData = {
+                    status: newStatus,
+                    updatedBy: updatedBy
+                };
+
+                // Add optional fields if provided
+                if (cost) statusData.estimatedCost = parseFloat(cost);
+                if (branch) statusData.branch = branch;
+                if (notes) statusData.notes = notes;
+
+                const result = await api.updateRepairStatus(repairId, statusData);
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+                if (result.success) {
+                    showToast('✓ تم تحديث الصيانة بنجاح!', 'success');
+                    // Refresh the table
+                    await searchRepairs();
+                } else {
+                    showToast('خطأ في تحديث الصيانة', 'error');
+                }
+            } catch (error) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                showToast('خطأ: ' + error.message, 'error');
+                console.error('Update error:', error);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+
+            // Set background color based on type
+            if (type === 'error') {
+                toast.style.background = 'linear-gradient(to bottom, var(--color-error) 0%, #c0392b 100%)';
+                toast.style.borderColor = '#a93226';
+            } else {
+                toast.style.background = 'linear-gradient(to bottom, var(--color-success) 0%, #229954 100%)';
+                toast.style.borderColor = '#1e8449';
+            }
+
+            // Show toast
+            toast.classList.remove('hiding');
+            toast.classList.add('show');
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => {
+                    toast.classList.remove('show', 'hiding');
+                }, 300);
+            }, 3000);
+        }
+
+        // ============================================================
+        // KEYBOARD AND CLICK EVENT HANDLERS
+        // ============================================================
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('editModal');
+                if (modal.style.display === 'flex') {
+                    closeEditModal();
+                }
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('editModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeEditModal();
+            }
+        });
+
+        // ============================================================
+        // IMAGE PREVIEW & MODAL FUNCTIONS
+        // ============================================================
+
+        let previewTimeout = null;
+        let currentImageUrl = '';
+        let currentRepairInfo = {};
+        let imageCache = {};
+        let base64Cache = {}; // Cache for Base64 images
+
+        /**
+         * Processes image URL to ensure compatibility with iframes
+         * Priority: base64 (imageDataUrl) > Google Drive direct view URL > original URL
+         * @param {Object} repair - Repair object with imageDataUrl and/or imageUrl
+         * @returns {string} - Processed image URL ready for display
+         */
+        function processImageUrl(repair) {
+            // Priority 1: Use base64 data URL if available (works in iframes without CORS issues)
+            if (repair.imageDataUrl && repair.imageDataUrl.trim() !== '') {
+                return repair.imageDataUrl;
+            }
+
+            // Priority 2: Convert Google Drive URL to direct view format (will be replaced with Base64 on load)
+            if (repair.imageUrl && repair.imageUrl.trim() !== '') {
+                return repair.imageUrl; // Return the original URL, will be converted to Base64 on-demand
+            }
+
+            // Priority 3: No image available
+            return '';
+        }
+
+        /**
+         * Fetches Base64 image data (Docker version - images already stored as base64)
+         * @param {string} imageUrl - Image URL or base64 data
+         * @param {Function} callback - Callback function to receive Base64 data
+         */
+        function fetchBase64Image(imageUrl, callback) {
+            // Check if already cached
+            if (base64Cache[imageUrl]) {
+                callback(base64Cache[imageUrl]);
+                return;
+            }
+
+            // In Docker version, images are already stored as base64 data URLs
+            // Just cache and return
+            if (imageUrl && imageUrl.startsWith('data:image')) {
+                base64Cache[imageUrl] = imageUrl;
+                callback(imageUrl);
+            } else {
+                // If not a data URL, just return the original URL
+                callback(imageUrl);
+            }
+        }
+
+        function showImagePreview(event, imageUrl, repairId) {
+            if (!imageUrl || imageUrl.trim() === '') return;
+
+            const preview = document.getElementById('imagePreviewHover');
+
+            // Clear any existing timeout
+            clearTimeout(previewTimeout);
+
+            // Position the preview near the cursor
+            const updatePosition = (e) => {
+                const offset = 20;
+                let x = e.clientX + offset;
+                let y = e.clientY + offset;
+
+                // Adjust if preview would go off screen
+                if (x + 400 > window.innerWidth) {
+                    x = e.clientX - 420; // Show on left side
+                }
+                if (y + 400 > window.innerHeight) {
+                    y = window.innerHeight - 420;
+                }
+
+                preview.style.left = x + 'px';
+                preview.style.top = y + 'px';
+            };
+
+            updatePosition(event);
+
+            // Show loading state
+            preview.innerHTML = '<div class="image-preview-loading"><div class="image-preview-spinner"></div></div>';
+            preview.classList.add('show');
+
+            // Delay loading to avoid loading on quick hovers
+            previewTimeout = setTimeout(() => {
+                loadImagePreview(imageUrl, preview);
+            }, 300);
+
+            // Update position as mouse moves
+            event.target.addEventListener('mousemove', updatePosition);
+        }
+
+        function loadImagePreview(imageUrl, preview) {
+            // Check if already a Base64 image
+            if (imageUrl.startsWith('data:image')) {
+                preview.innerHTML = `<img src="${imageUrl}" alt="Repair Image Preview">`;
+                imageCache[imageUrl] = imageUrl;
+                return;
+            }
+
+            // Check if Base64 version is cached
+            if (base64Cache[imageUrl]) {
+                preview.innerHTML = `<img src="${base64Cache[imageUrl]}" alt="Repair Image Preview">`;
+                return;
+            }
+
+            // Fetch Base64 version from server for Google Drive URLs
+            if (imageUrl.includes('drive.google.com')) {
+                fetchBase64Image(imageUrl, function(base64Data) {
+                    if (base64Data && preview.classList.contains('show')) {
+                        preview.innerHTML = `<img src="${base64Data}" alt="Repair Image Preview">`;
+                    } else if (preview.classList.contains('show')) {
+                        // Fallback to original URL if Base64 fetch fails
+                        loadImageFallback(imageUrl, preview);
+                    }
+                });
+            } else {
+                // For non-Drive URLs, use fallback
+                loadImageFallback(imageUrl, preview);
+            }
+        }
+
+        function loadImageFallback(imageUrl, preview) {
+            // Check if image is cached
+            if (imageCache[imageUrl]) {
+                preview.innerHTML = `<img src="${imageCache[imageUrl]}" alt="Repair Image Preview">`;
+                return;
+            }
+
+            // Load image directly
+            const img = new Image();
+            img.onload = function() {
+                imageCache[imageUrl] = imageUrl;
+                if (preview.classList.contains('show')) {
+                    preview.innerHTML = `<img src="${imageUrl}" alt="Repair Image Preview">`;
+                }
+            };
+            img.onerror = function() {
+                if (preview.classList.contains('show')) {
+                    // Keep showing loading animation on error for hover preview
+                    // User can click to open modal for more details
+                }
+            };
+            img.src = imageUrl;
+        }
+
+        function hideImagePreview() {
+            clearTimeout(previewTimeout);
+            const preview = document.getElementById('imagePreviewHover');
+            preview.classList.remove('show');
+
+            // Clean up after animation
+            setTimeout(() => {
+                if (!preview.classList.contains('show')) {
+                    preview.innerHTML = '<div class="image-preview-loading"><div class="image-preview-spinner"></div></div>';
+                }
+            }, 300);
+        }
+
+        function openImageModal(imageUrl, repairId, deviceName) {
+            if (!imageUrl || imageUrl.trim() === '') return;
+
+            currentImageUrl = imageUrl;
+            currentRepairInfo = {
+                repairId: repairId,
+                deviceName: deviceName,
+                imageUrl: imageUrl
+            };
+
+            // Set modal title
+            const title = repairId
+                ? `🖼️ ${deviceName || 'Device'} - ${repairId}`
+                : `🖼️ ${deviceName || 'Repair Image'}`;
+            document.getElementById('imageModalTitle').textContent = title;
+
+            // Show modal with animation first
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+
+            // Get loading indicator and image elements
+            const loading = document.getElementById('imageModalLoading');
+            const modalImg = document.getElementById('imageModalImg');
+
+            // Show loading state, hide image
+            loading.classList.remove('hidden');
+            modalImg.classList.remove('loaded');
+            modalImg.src = '';
+
+            // Function to handle successful image load
+            const handleImageLoad = function() {
+                loading.classList.add('hidden');
+                modalImg.classList.add('loaded');
+            };
+
+            // Function to handle image load error
+            const handleImageError = function() {
+                // Keep showing loading animation instead of error message
+                // Hide the loading animation after 3 seconds
+                setTimeout(() => {
+                    loading.classList.add('hidden');
+                }, 3000);
+            };
+
+            // Remove old event listeners to prevent memory leaks
+            modalImg.onload = null;
+            modalImg.onerror = null;
+
+            // Add new event listeners
+            modalImg.onload = handleImageLoad;
+            modalImg.onerror = handleImageError;
+
+            // Load image with Base64 conversion for Google Drive URLs
+            // Check if already a Base64 image
+            if (imageUrl.startsWith('data:image')) {
+                modalImg.src = imageUrl;
+            }
+            // Check if Base64 version is cached
+            else if (base64Cache[imageUrl]) {
+                modalImg.src = base64Cache[imageUrl];
+            }
+            // Fetch Base64 version for Google Drive URLs
+            else if (imageUrl.includes('drive.google.com')) {
+                fetchBase64Image(imageUrl, function(base64Data) {
+                    if (base64Data) {
+                        modalImg.src = base64Data;
+                        modalImg.alt = 'Repair Image';
+                    } else {
+                        // Fallback to original URL if Base64 fetch fails
+                        modalImg.src = imageUrl;
+                        modalImg.alt = 'Repair Image';
+                    }
+                });
+            } else {
+                // For non-Drive URLs, use original
+                modalImg.src = imageUrl;
+            }
+
+            // For now, hide navigation as we only have one image per repair
+            // In the future, this can be extended to support multiple images
+            document.getElementById('imagePrevBtn').classList.add('hidden');
+            document.getElementById('imageNextBtn').classList.add('hidden');
+            document.getElementById('imageCounter').classList.add('hidden');
+
+            // Hide hover preview if visible
+            hideImagePreview();
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('show');
+
+            setTimeout(() => {
+                modal.style.display = 'none';
+                const modalImg = document.getElementById('imageModalImg');
+                const loading = document.getElementById('imageModalLoading');
+
+                // Reset image state
+                modalImg.src = '';
+                modalImg.classList.remove('loaded');
+
+                // Reset loading state
+                loading.classList.remove('hidden');
+            }, 300);
+        }
+
+        function navigateImage(direction) {
+            // Placeholder for future multi-image support
+            // Currently, each repair has only one image
+            // This function can be extended when multiple images per repair are supported
+            console.log('Navigate image:', direction);
+        }
+
+        // Close image modal on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const imageModal = document.getElementById('imageModal');
+                if (imageModal.classList.contains('show')) {
+                    closeImageModal();
+                }
+            }
+        });
+
+        // Close image modal when clicking outside
+        document.getElementById('imageModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeImageModal();
+            }
+        });
+
+    </script>
+</body>
+</html>

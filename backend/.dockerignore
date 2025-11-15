@@ -1,0 +1,65 @@
+# Node modules (will be installed in container)
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+
+# Development files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Testing
+coverage
+.nyc_output
+test
+
+# Documentation
+*.md
+!README.md
+
+# Git
+.git
+.gitignore
+
+# PM2
+ecosystem.config.js
+
+# Build artifacts
+dist
+build
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Uploads (should use volumes)
+uploads/*
+!uploads/.gitkeep
+
+# Database data
+*.sqlite
+*.db
+
+# Prisma migrations (included, but data files excluded)
+prisma/dev.db*

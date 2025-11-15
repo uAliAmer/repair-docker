@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repair Tracking System</title>
+    <link rel="icon" type="image/png" href="favicon.ico">
+
+    <!-- Cairo Font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Liquid Glass Design System CSS -->
+    <link rel="stylesheet" href="liquid-glass.css">
+
+    <style>
+        /* ============================================================
+           PAGE-SPECIFIC STYLES FOR INDEX.HTML
+           ============================================================ */
+
+        :root {
+            --floating-navbar-offset: 0px;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           FLOATING NAVIGATION BAR - APPLE LIQUID GLASS DESIGN
+           ============================================================ */
+
+        .floating-navbar {
+            position: fixed;
+            top: var(--space-xl);
+            left: 50%;
+            transform: translate3d(-50%, 0, 0);
+            margin: 0 auto;
+            z-index: 1100;
+            display: flex;
+            justify-content: center;
+            padding: var(--space-sm) var(--space-lg);
+            width: min(900px, calc(100% - 2 * var(--space-lg)));
+            opacity: 1;
+
+            /* Apple Liquid Glass Effect */
+            background: rgba(255, 255, 255, 0.42);
+            backdrop-filter: saturate(220%) blur(32px);
+            -webkit-backdrop-filter: saturate(220%) blur(32px);
+
+            /* Soft rounded pill shape */
+            border-radius: var(--radius-full);
+
+            /* Layered shadows for depth */
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.12),
+                0 2px 8px rgba(0, 0, 0, 0.08),
+                inset 0 1px 1px rgba(255, 255, 255, 0.8);
+
+            /* Subtle border */
+            border: 1px solid rgba(255, 255, 255, 0.4);
+
+            /* Smooth animations */
+            transition:
+                transform 0.35s cubic-bezier(0.33, 1, 0.68, 1),
+                opacity 0.35s ease,
+                box-shadow var(--transition-base);
+            will-change: transform, opacity;
+        }
+
+        .floating-navbar.navbar-hidden {
+            transform: translate3d(-50%, -120%, 0);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .floating-navbar:hover {
+            background: rgba(255, 255, 255, 0.78);
+            box-shadow:
+                0 12px 40px rgba(0, 0, 0, 0.14),
+                0 4px 12px rgba(0, 0, 0, 0.1),
+                inset 0 1px 1px rgba(255, 255, 255, 0.9);
+            transform: translate(-50%, -2px);
+        }
+
+        /* Navigation Links Container */
+        .nav-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--space-md);
+            align-items: stretch;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Individual Nav Link */
+        .nav-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-xs);
+            justify-content: center;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-xl);
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            white-space: nowrap;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            width: 100%;
+            text-align: center;
+        }
+
+        button.nav-link {
+            border: 1px solid transparent;
+            background: transparent;
+            font: inherit;
+        }
+
+        button.nav-link:focus {
+            outline: none;
+        }
+
+        /* Ripple effect on click */
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(0, 122, 255, 0.15);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out;
+        }
+
+        .nav-link:active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .nav-link:hover {
+            background: rgba(0, 0, 0, 0.04);
+            color: var(--color-text);
+        }
+
+        /* Active state - liquid glass pill with glow */
+        .nav-link.active {
+            background: rgba(0, 122, 255, 0.15);
+            color: var(--color-primary);
+            font-weight: 600;
+            border-color: rgba(0, 122, 255, 0.3);
+            box-shadow:
+                0 0 0 1px rgba(0, 122, 255, 0.2),
+                inset 0 1px 2px rgba(255, 255, 255, 0.5),
+                0 4px 12px rgba(0, 122, 255, 0.15);
+        }
+
+        .nav-link.active:hover {
+            background: rgba(0, 122, 255, 0.2);
+        }
+
+        .nav-link span:first-child {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .nav-link span:last-child {
+            font-size: 0.9rem;
+            line-height: 1.1;
+        }
+
+        .nav-link-danger {
+            color: var(--color-error);
+            border-color: rgba(255, 59, 48, 0.2);
+            background: rgba(255, 59, 48, 0.08);
+        }
+
+        .nav-link-danger:hover {
+            color: var(--color-error);
+            background: rgba(255, 59, 48, 0.15);
+            border-color: rgba(255, 59, 48, 0.3);
+        }
+
+        .nav-link-danger:active {
+            background: rgba(255, 59, 48, 0.2);
+        }
+
+        /* Application Layout */
+        #appScreen {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            box-sizing: border-box;
+            overflow: visible;
+        }
+
+        /* ============================================================
+           CONTENT AREA
+           ============================================================ */
+
+        .content-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            min-height: 0;  
+            margin-top: var(--floating-navbar-offset, 0px);
+        }
+
+        .page-content {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--transition-base), transform var(--transition-base);
+            pointer-events: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .page-content.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+        }
+
+        /* Custom scrollbar */
+        .page-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .page-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .page-content::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-full);
+        }
+
+        .page-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        /* ============================================================
+           LOGIN CONTAINER
+           ============================================================ */
+
+        .login-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: var(--color-background);
+            padding: var(--space-lg);
+            overflow-y: auto;
+            z-index: 2000;
+        }
+
+        .login-container.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: saturate(180%) blur(30px);
+            -webkit-backdrop-filter: saturate(180%) blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: var(--radius-2xl);
+            box-shadow: var(--shadow-glass);
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.08) 0%, rgba(94, 92, 230, 0.06) 100%);
+            backdrop-filter: blur(10px);
+            color: var(--color-text);
+            padding: var(--space-xxl) var(--space-xl);
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .login-header h1 {
+            font-size: var(--font-size-xxl);
+            font-weight: 700;
+            font-family: var(--font-family-display);
+            margin-bottom: var(--space-sm);
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .login-body {
+            padding: var(--space-xl);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--color-text);
+            margin-bottom: var(--space-xs);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--color-text);
+            border-radius: var(--radius-lg);
+            transition: all var(--transition-base);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1),
+                        0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: var(--space-md) var(--space-lg);
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 122, 255, 0.35),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--color-error);
+            padding: var(--space-md) var(--space-lg);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-lg);
+            font-size: var(--font-size-sm);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .error-message.hidden {
+            display: none;
+        }
+
+        .login-footer {
+            background: rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            padding: var(--space-lg);
+            text-align: center;
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        /* ============================================================
+           LOADING INDICATOR
+           ============================================================ */
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(245, 247, 250, 0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-base);
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 122, 255, 0.2);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+           RESPONSIVE DESIGN - MOBILE
+           ============================================================ */
+
+        @media (max-width: 1023px) {
+            .nav-links {
+                gap: var(--space-sm);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .floating-navbar {
+                width: calc(100% - 16px);
+                padding: var(--space-xs) var(--space-sm);
+                border-radius: var(--radius-2xl);
+            }
+
+            .nav-links {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: var(--space-xs);
+            }
+
+            .nav-link {
+                padding: 6px var(--space-sm);
+                font-size: 0.95rem;
+                border-radius: var(--radius-lg);
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .nav-link span:first-child {
+                font-size: 1.1rem;
+            }
+
+            .nav-link span:last-child {
+                font-size: 0.8rem;
+                display: inline;
+            }
+
+            .content-wrapper {
+                padding: 0;
+            }
+
+            #appScreen {
+                padding: var(--space-sm);
+                gap: var(--space-sm);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .floating-navbar {
+                border-radius: var(--radius-xl);
+            }
+
+            .nav-link {
+                padding: 6px;
+                gap: 4px;
+            }
+
+            .nav-link-danger {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Hidden utility */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🔧 نظام تتبع الصيانات</h1>
+                <p>يرجى تسجيل الدخول للمتابعة</p>
+            </div>
+            <div class="login-body">
+                <div id="errorMessage" class="error-message hidden"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label" for="username">👤 اسم المستخدم</label>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            class="form-input"
+                            placeholder="أدخل اسم المستخدم"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">🔒 كلمة المرور</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="form-input"
+                            placeholder="أدخل كلمة المرور"
+                            autocomplete="current-password"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn-login">🔐 تسجيل الدخول</button>
+                </form>
+            </div>
+            <div class="login-footer">
+                وصول آمن لإدارة الصيانات
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Screen (shown after login) -->
+    <div id="appScreen" class="hidden">
+        <!-- Floating Navigation Bar -->
+        <nav class="floating-navbar" data-navbar>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" data-page="dashboard">
+                    <span>📊</span>
+                    <span>لوحة التحكم</span>
+                </a>
+                <a href="#" class="nav-link" data-page="form">
+                    <span>📝</span>
+                    <span>إصلاح جديد</span>
+                </a>
+                <a href="#" class="nav-link" data-page="scanner">
+                    <span>🔍</span>
+                    <span>الماسح الضوئي</span>
+                </a>
+                <a href="#" class="nav-link" data-page="repair-center">
+                    <span>🔧</span>
+                    <span>مركز الصيانة</span>
+                </a>
+                <a href="#" class="nav-link" data-page="reports">
+                    <span>📈</span>
+                    <span>التقارير</span>
+                </a>
+                <button id="logoutBtn" class="nav-link nav-link-danger" data-action="logout">
+                    <span>🚪</span>
+                    <span>خروج</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Page Content Wrapper -->
+        <div class="content-wrapper" data-scroll-container>
+            <!-- Dashboard Page -->
+            <div id="page-dashboard" class="page-content active">
+                <iframe src="Dashboard.html" style="width: 100%; height: 100%; border: none;" allow="camera"></iframe>
+            </div>
+
+            <!-- Repair Form Page -->
+            <div id="page-form" class="page-content">
+                <iframe src="RepairForm.html" style="width: 100%; height: 100%; border: none;" allow="camera"></iframe>
+            </div>
+
+            <!-- QR Scanner Page -->
+            <div id="page-scanner" class="page-content">
+                <iframe src="QRScanner.html" style="width: 100%; height: 100%; border: none;" allow="camera"></iframe>
+            </div>
+
+            <!-- Repair Center Page -->
+            <div id="page-repair-center" class="page-content">
+                <iframe src="RepairCenter.html" style="width: 100%; height: 100%; border: none;" allow="camera"></iframe>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="page-reports" class="page-content">
+                <iframe src="Reports.html" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script>
+        (function() {
+            const navbar = document.querySelector('[data-navbar]');
+            const scrollContainer = document.querySelector('[data-scroll-container]');
+            if (!navbar) return;
+
+            const htmlEl = document.documentElement;
+            const EXTRA_SPACING = 16; // breathing room between navbar and content
+
+            const setNavbarOffset = () => {
+                const computedStyles = window.getComputedStyle(navbar);
+                const navbarHeight = navbar.offsetHeight;
+                const topSpacing = parseFloat(computedStyles.top) || 0;
+                const totalOffset = navbarHeight + topSpacing + EXTRA_SPACING;
+                htmlEl.style.setProperty('--floating-navbar-offset', `${totalOffset}px`);
+            };
+
+            if (window.ResizeObserver) {
+                const resizeObserver = new ResizeObserver(setNavbarOffset);
+                resizeObserver.observe(navbar);
+            }
+
+            window.addEventListener('resize', setNavbarOffset, { passive: true });
+            window.addEventListener('orientationchange', setNavbarOffset, { passive: true });
+            setNavbarOffset();
+
+            let pendingPosition = 0;
+            let lastPosition = 0;
+            let accumDelta = 0;
+            let rafPending = false;
+            let initialized = false;
+            const HIDE_THRESHOLD = 28;
+            const SHOW_THRESHOLD = 18;
+            const MIN_SCROLL = 56;
+
+            const processScroll = () => {
+                const position = pendingPosition;
+                rafPending = false;
+
+                if (!initialized) {
+                    lastPosition = position;
+                    initialized = true;
+                    return;
+                }
+
+                const delta = position - lastPosition;
+                lastPosition = position;
+
+                if (position < MIN_SCROLL) {
+                    navbar.classList.remove('navbar-hidden');
+                    accumDelta = 0;
+                    return;
+                }
+
+                accumDelta += delta;
+
+                if (accumDelta > HIDE_THRESHOLD) {
+                    navbar.classList.add('navbar-hidden');
+                    accumDelta = 0;
+                } else if (accumDelta < -SHOW_THRESHOLD) {
+                    navbar.classList.remove('navbar-hidden');
+                    accumDelta = 0;
+                }
+            };
+
+            const scheduleScrollProcessing = (position) => {
+                const nextPosition = Math.max(position || 0, 0);
+                pendingPosition = nextPosition;
+                if (!rafPending) {
+                    requestAnimationFrame(processScroll);
+                    rafPending = true;
+                }
+            };
+
+            if (scrollContainer) {
+                scrollContainer.addEventListener('scroll', () => {
+                    scheduleScrollProcessing(scrollContainer.scrollTop);
+                }, { passive: true });
+            }
+
+            window.addEventListener('scroll', () => {
+                scheduleScrollProcessing(window.scrollY);
+            }, { passive: true });
+
+            const iframeWindows = new Set();
+
+            if (scrollContainer) {
+                const registerIframe = (frame) => {
+                    frame.addEventListener('load', () => {
+                        try {
+                            const frameWindow = frame.contentWindow;
+                            if (!frameWindow) return;
+                            iframeWindows.add(frameWindow);
+                            frameWindow.postMessage({ type: 'parent-scroll-ready' }, window.location.origin);
+                        } catch (error) {
+                            console.warn('Iframe scroll tracking requires same-origin access.', error);
+                        }
+                    });
+                };
+
+                scrollContainer.querySelectorAll('iframe').forEach(registerIframe);
+            }
+
+            window.addEventListener('message', (event) => {
+                if (!event.data || event.data.type !== 'iframe-scroll') return;
+                if (event.origin !== window.location.origin) return;
+                if (event.source && iframeWindows.has(event.source)) {
+                    scheduleScrollProcessing(event.data.scrollTop || 0);
+                }
+            });
+        })();
+
+        // ============================================================
+        // APPLICATION CONTROLLER
+        // ============================================================
+
+        const App = {
+            currentPage: 'dashboard',
+            session: null,
+
+            init() {
+                console.log('🔧 Repair Tracker - Initializing...');
+                this.setupEventListeners();
+                this.checkAuthentication();
+            },
+
+            setupEventListeners() {
+                // Login form
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+
+                // Logout button
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    this.handleLogout();
+                });
+
+                // Navigation links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const page = link.getAttribute('data-page');
+                        this.navigateToPage(page);
+                    });
+                });
+            },
+
+            async checkAuthentication() {
+                this.showLoading();
+
+                try {
+                    const result = await api.validateSession();
+
+                    if (result.success) {
+                        this.session = result.session;
+                        this.showApp();
+                    } else {
+                        this.showLogin();
+                    }
+                } catch (error) {
+                    console.error('Auth check failed:', error);
+                    this.showLogin();
+                } finally {
+                    this.hideLoading();
+                }
+            },
+
+            async handleLogin() {
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value;
+                const errorEl = document.getElementById('errorMessage');
+                const submitBtn = document.querySelector('.btn-login');
+
+                errorEl.classList.add('hidden');
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ جارٍ تسجيل الدخول...';
+
+                try {
+                    const result = await api.login(username, password);
+
+                    if (result.success) {
+                        this.session = result.session;
+                        this.showApp();
+                    } else {
+                        errorEl.textContent = '❌ اسم المستخدم أو كلمة المرور غير صحيحة';
+                        errorEl.classList.remove('hidden');
+                        document.getElementById('password').value = '';
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    errorEl.textContent = '⚠️ خطأ في الاتصال. يرجى المحاولة مرة أخرى.';
+                    errorEl.classList.remove('hidden');
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '🔐 تسجيل الدخول';
+                }
+            },
+
+            async handleLogout() {
+                if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                    this.showLoading();
+                    await api.logout();
+                    this.session = null;
+                    this.showLogin();
+                    this.hideLoading();
+                }
+            },
+
+            navigateToPage(page) {
+                if (this.currentPage === page) return;
+
+                // Remove active class from all links
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                // Add active class to current link
+                document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+                // Hide all pages
+                document.querySelectorAll('.page-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Show current page
+                document.getElementById(`page-${page}`).classList.add('active');
+
+                this.currentPage = page;
+                console.log(`📄 Navigated to: ${page}`);
+            },
+
+            showLogin() {
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('appScreen').classList.add('hidden');
+                document.getElementById('username').focus();
+            },
+
+            showApp() {
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('appScreen').classList.remove('hidden');
+            },
+
+            showLoading() {
+                document.getElementById('loadingOverlay').classList.add('active');
+            },
+
+            hideLoading() {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }
+        };
+
+        // Initialize app when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            App.init();
+        });
+    </script>
+</body>
+</html>

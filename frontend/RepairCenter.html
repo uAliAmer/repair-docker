@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <title>مركز الصيانة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="api-client.js"></script>
+    <style>
+        /* ============================================================
+           LIQUID GLASS DESIGN SYSTEM
+           Apple-Inspired Glassmorphism Aesthetic
+           ============================================================ */
+
+        /* CSS Variables - Core Design Tokens */
+        :root {
+            /* Apple-Inspired Color Palette */
+            --color-primary: #007AFF;
+            --color-primary-light: #5AC8FA;
+            --color-primary-dark: #0051D5;
+            --color-accent: #5E5CE6;
+            --color-accent-dark: #4644CC;
+            --color-accent-light: #BF5AF2;
+            --color-success: #34C759;
+            --color-warning: #FF9500;
+            --color-error: #FF3B30;
+            --color-info: #5AC8FA;
+
+            /* Neutral Glass Tones */
+            --color-background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+            --color-surface: rgba(255, 255, 255, 0.7);
+            --color-surface-elevated: rgba(255, 255, 255, 0.85);
+            --color-glass: rgba(255, 255, 255, 0.25);
+            --color-glass-hover: rgba(255, 255, 255, 0.35);
+            --color-border: rgba(0, 0, 0, 0.08);
+            --color-border-light: rgba(255, 255, 255, 0.18);
+            --color-text: #1D1D1F;
+            --color-text-secondary: #6E6E73;
+            --color-text-tertiary: #8E8E93;
+
+            /* Typography - SF Pro-like */
+            --font-family: Cairo;
+            /* --font-family-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif; */
+            /* --font-mono: 'SF Mono', 'Monaco', 'Courier New', monospace; */
+            --font-size-base: 15px;
+            --font-size-sm: 13px;
+            --font-size-lg: 17px;
+            --font-size-xl: 22px;
+            --font-size-xxl: 28px;
+
+            /* Spacing - Generous Apple-style */
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-xxl: 48px;
+
+            /* Glass Shadows - Soft & Layered */
+            --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.16);
+            --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            --shadow-glass: 0 12px 40px rgba(15, 23, 42, 0.18);
+            --shadow-focus: 0 0 0 3px rgba(0, 122, 255, 0.25);
+
+            /* Border Radius - Rounded Apple Style */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            --radius-full: 9999px;
+
+            /* Transitions - Smooth & Fluid */
+            --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+            /* Blur Effects */
+            --blur-sm: 10px;
+            --blur-md: 20px;
+            --blur-lg: 40px;
+        }
+
+        /* ============================================================
+           BASE STYLES
+           ============================================================ */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: var(--font-size-base);
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding: var(--space-lg);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            padding: var(--space-xl);
+            background: var(--color-surface-elevated);
+            backdrop-filter: blur(var(--blur-md));
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-glass);
+            border: 1px solid var(--color-border-light);
+        }
+
+        .page-header h1 {
+            font-family: var(--font-family-display);
+            font-size: var(--font-size-xxl);
+            font-weight: 600;
+            margin-bottom: var(--space-sm);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+        }
+
+        /* ============================================================
+           CARDS
+           ============================================================ */
+
+        .card {
+            background: var(--color-surface-elevated);
+            backdrop-filter: blur(var(--blur-md));
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-glass);
+            border: 1px solid var(--color-border-light);
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            color: var(--color-text);
+        }
+
+        /* ============================================================
+           MODE SELECTOR
+           ============================================================ */
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .mode-option {
+            background: linear-gradient(135deg, var(--color-surface) 0%, var(--color-glass) 100%);
+            border: 2px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .mode-option:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-primary);
+        }
+
+        .mode-option.active {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            border-color: var(--color-primary);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .mode-option .icon {
+            font-size: 32px;
+            margin-bottom: var(--space-sm);
+        }
+
+        .mode-option .label {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           QR SCANNER
+           ============================================================ */
+
+        #reader {
+            max-width: 100%;
+            margin: 0 auto var(--space-lg);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+        }
+
+        .btn {
+            width: 100%;
+            padding: var(--space-md) var(--space-xl);
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--color-success) 0%, #2d9c4e 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--color-warning) 0%, #e08600 100%);
+        }
+
+        .btn-error {
+            background: linear-gradient(135deg, var(--color-error) 0%, #d32f2f 100%);
+        }
+
+        /* ============================================================
+           REPAIR DETAILS
+           ============================================================ */
+
+        .repair-details {
+            display: none;
+        }
+
+        .repair-details.visible {
+            display: block;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            background: var(--color-surface);
+            border-radius: var(--radius-md);
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: var(--color-text-secondary);
+        }
+
+        .detail-value {
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        .completion-input-group {
+            display: none;
+            margin-top: var(--space-md);
+        }
+
+        .completion-input-group label {
+            display: block;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .completion-input-group input,
+        .completion-input-group textarea,
+        .completion-input-group select {
+            width: 100%;
+            padding: var(--space-md);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            background: var(--color-surface);
+            font-size: var(--font-size-base);
+            transition: border-color var(--transition-base), box-shadow var(--transition-base);
+        }
+
+        .completion-input-group textarea {
+            min-height: 110px;
+            resize: vertical;
+            line-height: 1.6;
+            direction: rtl;
+        }
+
+        .completion-input-group select {
+            direction: rtl;
+        }
+
+        #completeCostInput {
+            direction: ltr;
+            text-align: left;
+        }
+
+        .completion-input-group input:focus,
+        .completion-input-group textarea:focus,
+        .completion-input-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: var(--shadow-focus);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+        }
+
+        .status-received {
+            background: rgba(0, 122, 255, 0.1);
+            color: var(--color-primary);
+        }
+
+        .status-in-repair {
+            background: rgba(255, 149, 0, 0.1);
+            color: var(--color-warning);
+        }
+
+        .status-complete {
+            background: rgba(52, 199, 89, 0.1);
+            color: var(--color-success);
+        }
+
+        .status-unrepairable {
+            background: rgba(255, 59, 48, 0.1);
+            color: var(--color-error);
+        }
+
+        /* ============================================================
+           LOADING OVERLAY
+           ============================================================ */
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+
+        @media (max-width: 768px) {
+            body {
+                padding: var(--space-md);
+            }
+
+            .page-header {
+                padding: var(--space-lg);
+            }
+
+            .page-header h1 {
+                font-size: var(--font-size-xl);
+            }
+
+            .mode-selector {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .card {
+                padding: var(--space-lg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1>🔧 مركز الصيانة</h1>
+            <p>اختر الإجراء وامسح رمز QR للتحديث</p>
+        </div>
+
+        <!-- Mode Selector -->
+        <div class="card">
+            <h2 class="card-title">اختر الإجراء</h2>
+            <div class="mode-selector">
+                <div class="mode-option active" data-mode="receive" onclick="selectMode('receive')">
+                    <div class="icon">📥</div>
+                    <div class="label">استلام جديد</div>
+                </div>
+                <div class="mode-option" data-mode="start" onclick="selectMode('start')">
+                    <div class="icon">🔧</div>
+                    <div class="label">بدء الصيانة</div>
+                </div>
+                <div class="mode-option" data-mode="complete" onclick="selectMode('complete')">
+                    <div class="icon">✅</div>
+                    <div class="label">إكمال الصيانة</div>
+                </div>
+                <div class="mode-option" data-mode="unrepairable" onclick="selectMode('unrepairable')">
+                    <div class="icon">❌</div>
+                    <div class="label">غير قابل للصيانة</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Scanner -->
+        <div class="card">
+            <h2 class="card-title">امسح رمز QR</h2>
+            <div id="reader"></div>
+            <button class="btn" id="startScanBtn" onclick="startScanning()">
+                📸 بدء المسح
+            </button>
+        </div>
+
+        <!-- Repair Details -->
+        <div class="card repair-details" id="repairDetails">
+            <h2 class="card-title">تفاصيل الطلب</h2>
+            <div class="detail-row">
+                <span class="detail-label">رقم الطلب:</span>
+                <span class="detail-value" id="detailRepairId">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">العميل:</span>
+                <span class="detail-value" id="detailCustomer">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">الجهاز:</span>
+                <span class="detail-value" id="detailDevice">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">المشكلة:</span>
+                <span class="detail-value" id="detailIssue">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">الحالة الحالية:</span>
+                <span class="detail-value"><span id="detailStatus" class="status-badge">-</span></span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">الفرع:</span>
+                <span class="detail-value" id="detailBranch">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">مركز التكلفة:</span>
+                <span class="detail-value" id="detailCostCenter">-</span>
+            </div>
+            <div class="completion-input-group" id="completeCostGroup">
+                <label for="completeCostInput">💰 التكلفة النهائية (د.ع)</label>
+                <input type="number" min="0" step="1000" id="completeCostInput" placeholder="أدخل التكلفة النهائية للصيانة">
+            </div>
+            <div class="completion-input-group" id="completeNotesGroup">
+                <label for="completeNotesInput">📝 الملاحظات (اختياري)</label>
+                <textarea id="completeNotesInput" placeholder="أدخل أي ملاحظات إضافية"></textarea>
+            </div>
+            <div class="completion-input-group" id="completeBranchGroup">
+                <label for="completeBranchSelect">🏢 الفرع</label>
+                <select id="completeBranchSelect">
+                    <option value="">اختر الفرع (في حال التغيير)</option>
+                    <option value="عكد النصارى">عكد النصارى</option>
+                    <option value="بابلون مول">بابلون مول</option>
+                    <option value="كمب سارة">كمب سارة</option>
+                </select>
+            </div>
+            <div class="completion-input-group" id="completeCostCenterGroup">
+                <label for="completeCostCenterSelect">🏷️ مركز التكلفة</label>
+                <select id="completeCostCenterSelect">
+                    <option value="">اختر مركز التكلفة</option>
+                    <option value="Customer">الزبون</option>
+                    <option value="Company">الشركة</option>
+                </select>
+            </div>
+            <button class="btn btn-success" id="updateStatusBtn" onclick="updateStatus()" style="margin-top: var(--space-lg);">
+                تحديث الحالة
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        // Global variables
+        let html5QrCode = null;
+        let currentMode = 'receive';
+        let currentRepair = null;
+
+        // Status mapping
+        const STATUS_MAP = {
+            receive: 'تم استلام في مركز الصيانة',
+            start: 'قيد الصيانة حاليا',
+            complete: 'مكتمل الصيانة',
+            unrepairable: 'غير قابل للصيانة'
+        };
+
+        const ACTION_BUTTON_LABELS = {
+            start: 'تأكيد بدء الصيانة',
+            complete: 'تأكيد إكمال الصيانة',
+            unrepairable: 'تعيين كغير قابل للصيانة'
+        };
+
+        const SUCCESS_MESSAGE_MAP = {
+            receive: '✅ تم تسجيل الجهاز كمستلم في مركز الصيانة.',
+            start: '✅ تم تحديث الحالة إلى قيد الصيانة.',
+            complete: '✅ تم تسجيل إكمال الصيانة بنجاح.',
+            unrepairable: '✅ تم تمييز الطلب كغير قابل للصيانة.'
+        };
+
+        // Beep sound function for QR scan success
+        function playBeep() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                // High-pitched beep at 1200Hz
+                oscillator.frequency.value = 1200;
+                oscillator.type = 'sine';
+
+                // Loud volume
+                gainNode.gain.value = 0.8;
+
+                // Play beep for 200ms
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+
+                // Cleanup
+                setTimeout(() => {
+                    oscillator.disconnect();
+                    gainNode.disconnect();
+                    audioContext.close();
+                }, 300);
+            } catch (error) {
+                console.error('Failed to play beep:', error);
+            }
+        }
+
+        // Select mode
+        function selectMode(mode) {
+            currentMode = mode;
+
+            // Update UI
+            document.querySelectorAll('.mode-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+
+            // Hide repair details
+            document.getElementById('repairDetails').classList.remove('visible');
+            currentRepair = null;
+
+            updateActionUI();
+        }
+
+        // Start QR scanning (only when user clicks button)
+        function startScanning() {
+            const startBtn = document.getElementById('startScanBtn');
+
+            if (html5QrCode) {
+                // Scanner already initialized, just start
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err => {
+                    console.error('Error starting scanner:', err);
+                    alert('خطأ في تشغيل الكاميرا: ' + err);
+                });
+            } else {
+                // Initialize scanner
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanFailure
+                ).catch(err => {
+                    console.error('Error initializing scanner:', err);
+                    alert('خطأ في تشغيل الكاميرا: ' + err);
+                });
+            }
+
+            startBtn.textContent = '🔄 جارٍ المسح...';
+            startBtn.disabled = true;
+        }
+
+        // QR scan success handler
+        function onScanSuccess(decodedText, decodedResult) {
+            // Play beep sound
+            playBeep();
+
+            // Stop scanning
+            if (html5QrCode) {
+                html5QrCode.stop().then(() => {
+                    console.log('Scanner stopped');
+                }).catch(err => {
+                    console.error('Error stopping scanner:', err);
+                });
+            }
+
+            // Reset scan button
+            const startBtn = document.getElementById('startScanBtn');
+            startBtn.textContent = '📸 بدء المسح';
+            startBtn.disabled = false;
+
+            // Load repair details
+            loadRepairDetails(decodedText.trim());
+        }
+
+        // QR scan failure handler
+        function onScanFailure(error) {
+            // Handle scan failure silently
+        }
+
+        // Load repair details
+        async function loadRepairDetails(repairId) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                // API returns { exists: true/false, repair: {...} }
+                const result = await api.searchByQRCode(repairId);
+                document.getElementById('loadingOverlay').style.display = 'none';
+
+                if (!result.exists || !result.repair) {
+                    alert('خطأ: رقم الطلب غير موجود');
+                    return;
+                }
+
+                // Extract repair object from result
+                const repair = result.repair;
+
+                // Store current repair
+                currentRepair = repair;
+
+                // Display repair details
+                document.getElementById('detailRepairId').textContent = repair.repairId;
+                document.getElementById('detailCustomer').textContent = repair.customerName || repair.customer || '-';
+                document.getElementById('detailDevice').textContent = repair.device;
+                document.getElementById('detailIssue').textContent = repair.issue || '-';
+                document.getElementById('detailBranch').textContent = repair.branch;
+                document.getElementById('detailCostCenter').textContent = formatCostCenter(repair.costCenter);
+
+                // Set status badge
+                const statusBadge = document.getElementById('detailStatus');
+                statusBadge.textContent = repair.repairStatus;
+                statusBadge.className = 'status-badge ' + getStatusClass(repair.repairStatus || '');
+
+                // Show repair details
+                document.getElementById('repairDetails').classList.add('visible');
+                updateActionUI(repair);
+
+                // Scroll to details
+                document.getElementById('repairDetails').scrollIntoView({ behavior: 'smooth' });
+
+                if (currentMode === 'receive') {
+                    await updateStatus(true);
+                }
+            } catch (error) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                const errorMsg = error && error.message ? error.message : (error || 'حدث خطأ غير معروف');
+                alert('خطأ: فشل في تحميل التفاصيل - ' + errorMsg);
+            }
+        }
+
+        // Get status class
+        function getStatusClass(status) {
+            if (!status) return 'status-received';
+            if (status.includes('تم استلام في مركز') || status.includes('تم استلام في')) {
+                return 'status-received';
+            } else if (status.includes('قيد الصيانة')) {
+                return 'status-in-repair';
+            } else if (status.includes('مكتمل')) {
+                return 'status-complete';
+            } else if (status.includes('غير قابل')) {
+                return 'status-unrepairable';
+            }
+            return 'status-received';
+        }
+
+        function formatCostCenter(value) {
+            if (value === 'Company') {
+                return 'الشركة';
+            }
+            if (value === 'Customer') {
+                return 'الزبون';
+            }
+            return '-';
+        }
+
+        // Update status
+        async function updateStatus(autoTriggered = false) {
+            if (!currentRepair) {
+                alert('خطأ: لا يوجد طلب محدد');
+                return;
+            }
+
+            const newStatus = STATUS_MAP[currentMode];
+            const repairId = currentRepair.repairId;
+
+            if (!newStatus) {
+                alert('خطأ: وضع غير معروف');
+                return;
+            }
+
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            const updateBtn = document.getElementById('updateStatusBtn');
+            if (updateBtn) {
+                updateBtn.disabled = true;
+            }
+
+            const payload = {
+                status: newStatus,
+                updatedBy: 'فني الصيانة'
+            };
+
+            if (currentMode === 'complete') {
+                const costInput = document.getElementById('completeCostInput');
+                const costValue = costInput ? costInput.value.trim() : '';
+
+                if (!costValue) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    if (updateBtn) {
+                        updateBtn.disabled = false;
+                    }
+                    alert('يرجى إدخال التكلفة النهائية قبل تأكيد إكمال الصيانة');
+                    return;
+                }
+
+                payload.cost = costValue;
+
+                const notesInput = document.getElementById('completeNotesInput');
+                const notesValue = notesInput ? notesInput.value.trim() : '';
+                if (notesValue) {
+                    payload.notes = notesValue;
+                }
+
+                const branchSelect = document.getElementById('completeBranchSelect');
+                const branchValue = branchSelect ? branchSelect.value.trim() : '';
+                if (branchValue && branchValue !== currentRepair.branch) {
+                    payload.branch = branchValue;
+                }
+
+                const costCenterSelect = document.getElementById('completeCostCenterSelect');
+                const costCenterValue = costCenterSelect ? costCenterSelect.value.trim() : '';
+                if (!costCenterValue) {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    if (updateBtn) {
+                        updateBtn.disabled = false;
+                    }
+                    alert('يرجى اختيار مركز التكلفة قبل تأكيد إكمال الصيانة');
+                    return;
+                }
+                payload.costCenter = costCenterValue;
+            }
+
+            try {
+                const result = await api.updateRepairStatus(repairId, payload);
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+                if (updateBtn) {
+                    updateBtn.disabled = false;
+                }
+
+                if (result.success) {
+                    alert(SUCCESS_MESSAGE_MAP[currentMode] || ('✅ تم تحديث الحالة بنجاح إلى: ' + newStatus));
+
+                    // Update current repair status
+                    currentRepair.repairStatus = newStatus;
+                    if (currentMode === 'complete' && payload.cost !== undefined) {
+                        currentRepair.cost = payload.cost;
+                        currentRepair.estimatedCost = payload.cost;
+                    }
+                    if (currentMode === 'complete' && payload.branch) {
+                        currentRepair.branch = payload.branch;
+                        const branchDisplay = document.getElementById('detailBranch');
+                        if (branchDisplay) {
+                            branchDisplay.textContent = payload.branch;
+                        }
+                    }
+                    if (currentMode === 'complete' && payload.costCenter) {
+                        currentRepair.costCenter = payload.costCenter;
+                        const costCenterDisplay = document.getElementById('detailCostCenter');
+                        if (costCenterDisplay) {
+                            costCenterDisplay.textContent = formatCostCenter(payload.costCenter);
+                        }
+                    }
+
+                    // Update display
+                    const statusBadge = document.getElementById('detailStatus');
+                    statusBadge.textContent = newStatus;
+                    statusBadge.className = 'status-badge ' + getStatusClass(newStatus);
+
+                    // Hide details after short delay
+                    setTimeout(() => {
+                        document.getElementById('repairDetails').classList.remove('visible');
+                        currentRepair = null;
+                        updateActionUI();
+                    }, 2000);
+                } else {
+                    alert('خطأ: فشل في تحديث الحالة');
+                }
+            } catch (error) {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                if (updateBtn) {
+                    updateBtn.disabled = false;
+                }
+                const errorMsg = error && error.message ? error.message : (error || 'حدث خطأ غير معروف');
+                alert('خطأ: فشل في تحديث الحالة - ' + errorMsg);
+            }
+        }
+
+        // Stop camera when page is hidden or user navigates away
+        function stopCamera() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().then(() => {
+                    console.log('Camera stopped due to page navigation/hide');
+                    const startBtn = document.getElementById('startScanBtn');
+                    if (startBtn) {
+                        startBtn.textContent = '📸 بدء المسح';
+                        startBtn.disabled = false;
+                    }
+                }).catch(err => {
+                    console.error('Error stopping camera:', err);
+                });
+            }
+        }
+
+        // Add event listeners for page visibility and navigation
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                stopCamera();
+            }
+        });
+
+        window.addEventListener('beforeunload', function() {
+            stopCamera();
+        });
+
+        window.addEventListener('pagehide', function() {
+            stopCamera();
+        });
+
+        function updateActionUI(repairOverride = null) {
+            const updateBtn = document.getElementById('updateStatusBtn');
+            const costGroup = document.getElementById('completeCostGroup');
+            const costInput = document.getElementById('completeCostInput');
+            const notesGroup = document.getElementById('completeNotesGroup');
+            const notesInput = document.getElementById('completeNotesInput');
+            const branchGroup = document.getElementById('completeBranchGroup');
+            const branchSelect = document.getElementById('completeBranchSelect');
+            const costCenterGroup = document.getElementById('completeCostCenterGroup');
+            const costCenterSelect = document.getElementById('completeCostCenterSelect');
+            const effectiveRepair = repairOverride || currentRepair;
+            const hasRepair = !!effectiveRepair;
+
+            if (updateBtn) {
+                if (currentMode === 'receive' || !hasRepair) {
+                    updateBtn.style.display = 'none';
+                } else {
+                    updateBtn.style.display = 'block';
+                    updateBtn.textContent = ACTION_BUTTON_LABELS[currentMode] || 'تحديث الحالة';
+                    updateBtn.disabled = false;
+                }
+            }
+
+            if (!costGroup || !costInput || !notesGroup || !notesInput || !branchGroup || !branchSelect || !costCenterGroup || !costCenterSelect) {
+                return;
+            }
+
+            if (currentMode === 'complete' && hasRepair) {
+                costGroup.style.display = 'block';
+                const existingCost = effectiveRepair.cost || effectiveRepair.estimatedCost || '';
+                costInput.value = existingCost !== null && existingCost !== undefined ? existingCost : '';
+
+                notesGroup.style.display = 'block';
+                notesInput.value = '';
+
+                branchGroup.style.display = 'block';
+
+                if (branchSelect.options && branchSelect.options.length) {
+                    const currentBranch = effectiveRepair.branch || '';
+                    let optionExists = false;
+                    for (let i = 0; i < branchSelect.options.length; i++) {
+                        if (branchSelect.options[i].value === currentBranch) {
+                            optionExists = true;
+                            break;
+                        }
+                    }
+                    if (!optionExists && currentBranch) {
+                        const opt = document.createElement('option');
+                        opt.value = currentBranch;
+                        opt.textContent = currentBranch;
+                        branchSelect.appendChild(opt);
+                    }
+                    branchSelect.value = currentBranch || '';
+                }
+
+                costCenterGroup.style.display = 'block';
+                const existingCostCenter = effectiveRepair.costCenter || 'Customer';
+                costCenterSelect.value = existingCostCenter;
+            } else {
+                costGroup.style.display = 'none';
+                costInput.value = '';
+                notesGroup.style.display = 'none';
+                notesInput.value = '';
+                branchGroup.style.display = 'none';
+                branchSelect.value = '';
+                costCenterGroup.style.display = 'none';
+                costCenterSelect.value = 'Customer';
+            }
+        }
+
+        updateActionUI();
+    </script>
+</body>
+</html>

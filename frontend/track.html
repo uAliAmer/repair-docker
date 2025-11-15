@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تتبع حالة الصيانة - NixFlow Repair</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #1a1a1a;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow:
+        0 8px 32px rgba(31, 38, 135, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      padding: 32px;
+      width: 100%;
+      max-width: 520px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      font-size: 1.75em;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      margin-bottom: 8px;
+    }
+
+    .header .repair-id {
+      font-size: 1.1em;
+      font-weight: 600;
+      color: #ffd700;
+      background: rgba(255, 215, 0, 0.2);
+      padding: 8px 16px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 700;
+      font-size: 1.15em;
+      text-align: center;
+      padding: 16px;
+      border-radius: 16px;
+      margin: 24px 0;
+      box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+      }
+      50% {
+        box-shadow: 0 4px 24px rgba(102, 126, 234, 0.6);
+      }
+    }
+
+    .timeline-section {
+      margin: 32px 0;
+    }
+
+    .timeline-title {
+      text-align: center;
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: relative;
+      margin: 0 8px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: 0;
+      left: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      z-index: 0;
+    }
+
+    .timeline::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(to left, #4caf50, #81c784);
+      z-index: 1;
+      transition: width 0.8s ease-out;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+      animation: progressGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes progressGlow {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(76, 175, 80, 0.9);
+      }
+    }
+
+    .timeline.stage-0::after { width: 0%; }
+    .timeline.stage-1::after { width: 20%; }
+    .timeline.stage-2::after { width: 40%; }
+    .timeline.stage-3::after { width: 60%; }
+    .timeline.stage-4::after { width: 80%; }
+    .timeline.stage-5::after { width: 100%; }
+
+    .timeline.stage-1::before,
+    .timeline.stage-2::before,
+    .timeline.stage-3::before,
+    .timeline.stage-4::before,
+    .timeline.stage-5::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(
+        to left,
+        transparent,
+        rgba(255, 255, 255, 0.6),
+        transparent
+      );
+      z-index: 2;
+      animation: shimmer 2.5s ease-in-out infinite;
+    }
+
+    .timeline.stage-1::before { width: 20%; }
+    .timeline.stage-2::before { width: 40%; }
+    .timeline.stage-3::before { width: 60%; }
+    .timeline.stage-4::before { width: 80%; }
+    .timeline.stage-5::before { width: 100%; }
+
+    @keyframes shimmer {
+      0% {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      20% {
+        opacity: 1;
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateX(0);
+        opacity: 0;
+      }
+    }
+
+    .timeline .progress-pulse {
+      position: absolute;
+      top: 14px;
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(circle, #fff, #4caf50);
+      border-radius: 50%;
+      box-shadow: 0 0 12px rgba(76, 175, 80, 0.8);
+      z-index: 3;
+      animation: movePulse 3s ease-in-out infinite;
+    }
+
+    .timeline.stage-0 .progress-pulse {
+      display: none;
+    }
+
+    @keyframes movePulse {
+      0% {
+        right: 0%;
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      10% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      90% {
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        right: 100%;
+        opacity: 0;
+        transform: scale(0.5);
+      }
+    }
+
+    .timeline.stage-1 .progress-pulse { animation: movePulse1 3s ease-in-out infinite; }
+    .timeline.stage-2 .progress-pulse { animation: movePulse2 3s ease-in-out infinite; }
+    .timeline.stage-3 .progress-pulse { animation: movePulse3 3s ease-in-out infinite; }
+    .timeline.stage-4 .progress-pulse { animation: movePulse4 3s ease-in-out infinite; }
+    .timeline.stage-5 .progress-pulse { animation: movePulse5 3s ease-in-out infinite; }
+
+    @keyframes movePulse1 {
+      0% { right: 0%; opacity: 0; transform: scale(0.5); }
+      10%, 90% { opacity: 1; transform: scale(1); }
+      100% { right: 20%; opacity: 0; transform: scale(0.5); }
+    }
+
+    @keyframes movePulse2 {
+      0% { right: 0%; opacity: 0; transform: scale(0.5); }
+      10%, 90% { opacity: 1; transform: scale(1); }
+      100% { right: 40%; opacity: 0; transform: scale(0.5); }
+    }
+
+    @keyframes movePulse3 {
+      0% { right: 0%; opacity: 0; transform: scale(0.5); }
+      10%, 90% { opacity: 1; transform: scale(1); }
+      100% { right: 60%; opacity: 0; transform: scale(0.5); }
+    }
+
+    @keyframes movePulse4 {
+      0% { right: 0%; opacity: 0; transform: scale(0.5); }
+      10%, 90% { opacity: 1; transform: scale(1); }
+      100% { right: 80%; opacity: 0; transform: scale(0.5); }
+    }
+
+    @keyframes movePulse5 {
+      0% { right: 0%; opacity: 0; transform: scale(0.5); }
+      10%, 90% { opacity: 1; transform: scale(1); }
+      100% { right: 100%; opacity: 0; transform: scale(0.5); }
+    }
+
+    .step {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .step .circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1em;
+      margin-bottom: 12px;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .step.done .circle {
+      background: linear-gradient(135deg, #4caf50, #81c784);
+      color: white;
+      box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+    }
+
+    .step.unrepairable .circle {
+      background: linear-gradient(135deg, #ff3b30, #d32f2f);
+      color: white;
+      box-shadow: 0 4px 16px rgba(255, 59, 48, 0.4);
+    }
+
+    .step.active .circle {
+      background: linear-gradient(135deg, #007aff, #5ac8fa);
+      color: white;
+      box-shadow:
+        0 0 0 4px rgba(0, 122, 255, 0.2),
+        0 6px 20px rgba(0, 122, 255, 0.5);
+      animation: activePulse 2s ease-in-out infinite, activeRotate 4s linear infinite;
+      transform: scale(1.15);
+      position: relative;
+    }
+
+    .step.active .circle::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 122, 255, 0.3);
+      animation: ripple 2s ease-out infinite;
+    }
+
+    @keyframes activePulse {
+      0%, 100% {
+        box-shadow:
+          0 0 0 4px rgba(0, 122, 255, 0.2),
+          0 6px 20px rgba(0, 122, 255, 0.5);
+      }
+      50% {
+        box-shadow:
+          0 0 0 8px rgba(0, 122, 255, 0.15),
+          0 8px 28px rgba(0, 122, 255, 0.7);
+      }
+    }
+
+    @keyframes activeRotate {
+      0% {
+        filter: hue-rotate(0deg) brightness(1);
+      }
+      50% {
+        filter: hue-rotate(10deg) brightness(1.1);
+      }
+      100% {
+        filter: hue-rotate(0deg) brightness(1);
+      }
+    }
+
+    @keyframes ripple {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    .step.pending .circle {
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      color: rgba(255, 255, 255, 0.6);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .step .label {
+      font-size: 0.75em;
+      font-weight: 600;
+      text-align: center;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      max-width: 90px;
+      line-height: 1.3;
+      transition: all 0.3s ease;
+    }
+
+    .step.pending {
+      filter: blur(2px);
+      opacity: 0.5;
+    }
+
+    .step.pending .label {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .info-row {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(10px);
+      padding: 14px 18px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .info-row.notes-row {
+      align-items: flex-start;
+    }
+
+    .info-row:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: translateX(-3px);
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95em;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-value {
+      color: #1a1a1a;
+      font-weight: 500;
+      text-align: left;
+      font-size: 0.95em;
+      direction: ltr;
+    }
+
+    .image-preview {
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .image-preview img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .image-preview img:hover {
+      transform: scale(1.03);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .footer p {
+      color: #fff;
+      font-size: 0.95em;
+      font-weight: 500;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .footer .logo {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-top: 8px;
+      color: #ffd700;
+    }
+
+    .loading,
+    .error {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .loading {
+      font-size: 1.1em;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top: 3px solid #fff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .error h2 {
+      color: #ffd700;
+      margin-bottom: 12px;
+    }
+
+    .error p {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 24px 18px;
+      }
+
+      .header h1 {
+        font-size: 1.4em;
+      }
+
+      .step .circle {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85em;
+      }
+
+      .step .label {
+        font-size: 0.7em;
+        max-width: 58px;
+      }
+
+      .info-row {
+        flex-direction: column;
+        gap: 6px;
+        text-align: center;
+      }
+
+      .info-value {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="app">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>جاري التحميل...</div>
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const API_BASE_URL = window.location.hostname === 'localhost'
+      ? 'http://localhost:3000'
+      : 'https://fix.nixflow.xyz';
+
+    // Get repair ID from URL
+    function getRepairIdFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    // Fetch repair data
+    async function fetchRepairData(repairId) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/repairs/${encodeURIComponent(repairId)}`);
+        const data = await response.json();
+
+        if (!data.success || !data.repair) {
+          throw new Error('الطلب غير موجود');
+        }
+
+        return data.repair;
+      } catch (error) {
+        console.error('Error fetching repair:', error);
+        throw error;
+      }
+    }
+
+    // Render repair info
+    function renderRepairInfo(repair) {
+      return `
+        <div class="header">
+          <h1>🔧 تتبع حالة الصيانة</h1>
+          <div class="repair-id">${repair.repairId}</div>
+        </div>
+
+        <div class="status-badge">
+          📦 الحالة الحالية: ${repair.repairStatus}
+        </div>
+
+        <div class="timeline-section">
+          <div class="timeline-title">⏳ مراحل الصيانة</div>
+          <div class="timeline stage-${calculateTimelineStage(repair.repairStatus)}" id="timeline" data-status="${repair.repairStatus}">
+            ${renderTimelineSteps(repair.repairStatus)}
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-row">
+            <span class="info-label">👤 الزبون:</span>
+            <span class="info-value">${repair.customerName}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label"> الجهاز:</span>
+            <span class="info-value">${repair.device}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">🏢 الفرع:</span>
+            <span class="info-value">${repair.branch}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">🔍 المشكلة:</span>
+            <span class="info-value">${repair.issue || 'غير محدد'}</span>
+          </div>
+          ${(() => {
+            const costCenter = repair.costCenter;
+            const rawCost = repair.cost || repair.estimatedCost;
+            const displayCost = costCenter === 'Company' ? 0 : rawCost;
+            return (displayCost !== undefined && displayCost !== null && displayCost !== '') ? `
+          <div class="info-row">
+            <span class="info-label">💰 الكلفة:</span>
+            <span class="info-value">${formatCost(displayCost)}</span>
+          </div>
+          ` : '';
+          })()}
+          ${repair.date ? `
+          <div class="info-row">
+            <span class="info-label">📅 تاريخ الاستلام:</span>
+            <span class="info-value">${repair.date}</span>
+          </div>
+          ` : ''}
+          ${repair.warranty ? `
+          <div class="info-row">
+            <span class="info-label">✅ الضمان:</span>
+            <span class="info-value">${repair.warranty}</span>
+          </div>
+          ` : ''}
+        </div>
+
+        ${renderNotes(repair.notes, repair.history)}
+
+        <div class="footer">
+          <p>شكراً لثقتكم ❤️</p>
+          <div class="logo">NixFlow Repair</div>
+          <p style="font-size: 0.85em; margin-top: 8px; color: rgba(255, 255, 255, 0.8);">© 2025 All Rights Reserved</p>
+        </div>
+      `;
+    }
+
+    const TIMELINE_STEPS = [
+      { label: 'تم الاستلام', key: 'RECEIVED_AQD' },
+      { label: 'تم استلام في مركز الصيانة', key: 'RECEIVED_CENTER' },
+      { label: 'قيد الصيانة حاليا', key: 'IN_REPAIR' },
+      { label: 'انتهت الصيانة', key: 'REPAIR_COMPLETE' },
+      { label: 'جاهز للاستلام', key: 'READY_FOR_PICKUP' },
+      { label: 'تم استلام من قبل الزبون', key: 'DELIVERED_TO_CUSTOMER' }
+    ];
+
+    const STATUS_TO_STAGE = {
+      'تم استلام في عكد النصارى': 0,
+      'تم استلام في بابلون مول': 0,
+      'تم استلام في كمب سارة': 0,
+      'تم استلام في مركز الصيانة': 1,
+      'قيد الصيانة حاليا': 2,
+      'مكتمل الصيانة': 3,
+      'غير قابل للصيانة': 3,
+      'جاهز للاستلام': 4,
+      'تم استلام من قبل الزبون': 5
+    };
+
+    function calculateTimelineStage(status) {
+      return STATUS_TO_STAGE[status] ?? 0;
+    }
+
+    function renderTimelineSteps(currentStatus) {
+      const stage = calculateTimelineStage(currentStatus);
+
+      return TIMELINE_STEPS.map((step, index) => {
+        const statusClass = index < stage
+          ? 'step done'
+          : index === stage
+            ? (currentStatus === 'غير قابل للصيانة' && index === 3 ? 'step unrepairable' : 'step active')
+            : 'step pending';
+
+        const circleContent = determineCircleContent(index, stage, currentStatus);
+
+        return `
+          <div class="${statusClass}" id="step${index}">
+            <div class="circle">${circleContent}</div>
+            <div class="label">${step.label}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function determineCircleContent(index, stage, currentStatus) {
+      if (index < stage) {
+        if (index === 3 && currentStatus === 'غير قابل للصيانة') {
+          return '❌';
+        }
+        return '✓';
+      }
+
+      if (index === stage) {
+        if (index === 3) {
+          return currentStatus === 'غير قابل للصيانة' ? '❌' : '✓';
+        }
+        return index + 1;
+      }
+
+      return '?';
+    }
+
+    function renderNotes(notes, history) {
+      const rawNoteText = Array.isArray(notes) && notes.length
+        ? notes[0].noteText || notes[0].notes
+        : (history && history.length ? history[0].notes : '');
+
+      const sanitizedNoteText = sanitizeNoteText(rawNoteText);
+
+      if (!sanitizedNoteText) {
+        return '';
+      }
+
+      return `
+        <div class="info-row notes-row" style="margin-top: 20px; flex-direction: column; gap: 8px;">
+          <span class="info-label">📝 ملاحظات:</span>
+          <span class="info-value" style="text-align: right; direction: rtl; width: 100%;">${sanitizedNoteText}</span>
+        </div>
+      `;
+    }
+
+    function sanitizeNoteText(noteText) {
+      if (!noteText) {
+        return '';
+      }
+
+      let sanitized = noteText.replace(/تم تحديث التكلفة:\s*/g, '');
+      sanitized = sanitized.replace(/مركز التكلفة:\s*الشركة/g, 'مركز التكلفة: على حساب الشركة');
+
+      // Clean up redundant separators or whitespace
+      sanitized = sanitized.replace(/\s*\|\s*/g, ' | ');
+      sanitized = sanitized.replace(/^\|\s*/g, '');
+      sanitized = sanitized.replace(/\s*\|$/g, '');
+
+      return sanitized.trim();
+    }
+
+    function formatCost(value) {
+      if (value === null || value === undefined || value === '') {
+        return '';
+      }
+
+      const numeric = typeof value === 'number' ? value : parseFloat(value);
+
+      if (!Number.isNaN(numeric)) {
+        return `${numeric.toLocaleString('en-US')} د.ع.`;
+      }
+
+      return `${value} د.ع.`;
+    }
+
+    // Format date
+    function formatDate(isoString) {
+      if (!isoString) return '';
+      const date = new Date(isoString);
+      return date.toLocaleDateString('ar-IQ', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    // Render error
+    function renderError(message) {
+      return `
+        <div class="error">
+          <h2>⚠️ خطأ</h2>
+          <p>${message}</p>
+          <p style="margin-top: 16px; font-size: 0.9em;">
+            يرجى التحقق من رقم الطلب والمحاولة مرة أخرى
+          </p>
+        </div>
+      `;
+    }
+
+    // Initialize app
+    async function init() {
+      const appElement = document.getElementById('app');
+      const repairId = getRepairIdFromURL();
+
+      if (!repairId) {
+        appElement.innerHTML = renderError('رقم الطلب غير موجود في الرابط');
+        return;
+      }
+
+      try {
+        const repair = await fetchRepairData(repairId);
+        appElement.innerHTML = renderRepairInfo(repair);
+        enhanceTimeline(repair);
+      } catch (error) {
+        appElement.innerHTML = renderError(error.message || 'حدث خطأ أثناء تحميل البيانات');
+      }
+    }
+
+    function enhanceTimeline(repair) {
+      const currentStage = calculateTimelineStage(repair.repairStatus);
+      const timeline = document.getElementById('timeline');
+      const steps = timeline ? timeline.querySelectorAll('.step') : [];
+
+      steps.forEach((step, index) => {
+        if (index < currentStage) {
+          step.classList.add('done');
+          if (index === 3 && repair.repairStatus === 'غير قابل للصيانة') {
+            step.classList.remove('done');
+            step.classList.add('unrepairable');
+            step.querySelector('.circle').textContent = '❌';
+          } else {
+            step.querySelector('.circle').textContent = '✓';
+          }
+        } else if (index === currentStage) {
+          if (index === 3 && repair.repairStatus === 'غير قابل للصيانة') {
+            step.classList.add('unrepairable');
+            step.querySelector('.circle').textContent = '❌';
+          } else {
+            step.classList.add('active');
+            step.querySelector('.circle').textContent = index + 1;
+          }
+        } else {
+          step.classList.add('pending');
+          step.querySelector('.circle').textContent = '?';
+        }
+      });
+
+      if (timeline && currentStage > 0) {
+        const pulse = document.createElement('div');
+        pulse.className = 'progress-pulse';
+        timeline.appendChild(pulse);
+      }
+
+      const card = document.querySelector('.card');
+      requestAnimationFrame(() => {
+        card.classList.add('loading');
+      });
+    }
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

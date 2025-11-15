@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    restart: always
+    environment:
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=n8n
+      - DB_POSTGRESDB_USER=n8n
+      - DB_POSTGRESDB_PASSWORD=supersecret
+      - N8N_HOST=n8n.nixflow.xyz
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n.nixflow.xyz/
+      - GENERIC_TIMEZONE=Asia/Baghdad
+    ports:
+      - "5678:5678"
+    volumes:
+      - ./n8n_data:/home/node/.n8n
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      - POSTGRES_USER=n8n
+      - POSTGRES_PASSWORD=supersecret
+      - POSTGRES_DB=n8n
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:alpine
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/certbot:/var/www/certbot
+      - ./nginx/ssl:/etc/letsencrypt
+      - ./nginx/html:/usr/share/nginx/html  # Add this line
+    depends_on:
+      - n8n
+
+
+  certbot:
+    image: certbot/certbot
+    entrypoint: /bin/sh -c
+    command: > 
+      "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h; done"
+    volumes:
+      - ./nginx/certbot:/var/www/certbot
+      - ./nginx/ssl:/etc/letsencrypt

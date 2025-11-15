@@ -326,13 +326,15 @@
 
         @media (max-width: 768px) {
             .status-mini-counters {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: calc(var(--space-xs) * 1);
             }
         }
 
         @media (max-width: 480px) {
             .status-mini-counters {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: calc(var(--space-xs) * 0.8);
             }
         }
 
@@ -348,6 +350,20 @@
             min-width: 0;
         }
 
+        @media (max-width: 768px) {
+            .mini-counter {
+                padding: calc(var(--space-xs) * 1.4);
+                gap: 2px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mini-counter {
+                padding: calc(var(--space-xs) * 1.2);
+                gap: 2px;
+            }
+        }
+
         .mini-counter-label {
             font-size: 0.95rem;
             font-weight: 600;
@@ -356,6 +372,19 @@
             word-wrap: break-word;
             overflow-wrap: break-word;
             hyphens: auto;
+        }
+
+        @media (max-width: 768px) {
+            .mini-counter-label {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mini-counter-label {
+                font-size: 0.75rem;
+                letter-spacing: 0.1px;
+            }
         }
 
         .mini-counter .rolling-number {
@@ -381,18 +410,6 @@
             visibility: hidden;
             min-height: 68px;
             pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-            .status-mini-placeholder {
-                min-height: 135px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .status-mini-placeholder {
-                min-height: 202px;
-            }
         }
 
         .rolling-number {

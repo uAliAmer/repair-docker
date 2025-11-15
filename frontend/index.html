@@ -576,11 +576,11 @@
         <!-- Floating Navigation Bar -->
         <nav class="floating-navbar" data-navbar>
             <div class="nav-links">
-                <a href="#" class="nav-link active" data-page="dashboard">
+                <a href="#" class="nav-link" data-page="dashboard">
                     <span>📊</span>
                     <span>لوحة التحكم</span>
                 </a>
-                <a href="#" class="nav-link" data-page="form">
+                <a href="#" class="nav-link active" data-page="form">
                     <span>📝</span>
                     <span>إصلاح جديد</span>
                 </a>
@@ -606,12 +606,12 @@
         <!-- Page Content Wrapper -->
         <div class="content-wrapper" data-scroll-container>
             <!-- Dashboard Page -->
-            <div id="page-dashboard" class="page-content active">
+            <div id="page-dashboard" class="page-content">
                 <iframe src="Dashboard.html" style="width: 100%; height: 100%; border: none;" allow="camera"></iframe>
             </div>
 
             <!-- Repair Form Page -->
-            <div id="page-form" class="page-content">
+            <div id="page-form" class="page-content active">
                 <iframe src="RepairForm.html" style="width: 100%; height: 100%; border: none;" allow="camera"></iframe>
             </div>
 
@@ -750,7 +750,7 @@
         // ============================================================
 
         const App = {
-            currentPage: 'dashboard',
+            currentPage: 'form',
             session: null,
 
             init() {

@@ -869,35 +869,94 @@
             }
         }
 
-        // Stop camera when page is hidden or user navigates away
-        function stopCamera() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    console.log('Camera stopped due to page navigation/hide');
-                    const startBtn = document.getElementById('startScanBtn');
-                    if (startBtn) {
-                        startBtn.textContent = '📸 بدء المسح';
-                        startBtn.disabled = false;
-                    }
+        // Comprehensive scanner cleanup function
+        function stopScanner() {
+            console.log('🛑 Stopping scanner and cleaning up resources...');
+
+            // Stop and clear Html5Qrcode instance
+            if (html5QrCode) {
+                if (html5QrCode.isScanning) {
+                    html5QrCode.stop().then(() => {
+                        console.log('✅ Scanner stopped successfully');
+                        html5QrCode.clear();
+                        html5QrCode = null;
+                    }).catch(err => {
+                        console.error('Error stopping scanner:', err);
+                        // Force clear even on error
+                        try {
+                            html5QrCode.clear();
+                        } catch (e) {}
+                        html5QrCode = null;
+                    });
+                } else {
+                    // Scanner exists but not scanning, just clear it
+                    try {
+                        html5QrCode.clear();
+                    } catch (e) {}
+                    html5QrCode = null;
+                }
+            }
+
+            // Manually stop all active media streams
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.enumerateDevices().then(devices => {
+                    // This ensures we stop any orphaned streams
                 }).catch(err => {
-                    console.error('Error stopping camera:', err);
+                    console.log('Could not enumerate devices:', err);
                 });
             }
+
+            // Stop any video elements that might be active
+            const videoElements = document.querySelectorAll('video');
+            videoElements.forEach(video => {
+                if (video.srcObject) {
+                    const stream = video.srcObject;
+                    const tracks = stream.getTracks();
+                    tracks.forEach(track => {
+                        track.stop();
+                        console.log('🎥 Stopped video track:', track.label);
+                    });
+                    video.srcObject = null;
+                }
+            });
+
+            // Reset UI
+            const startBtn = document.getElementById('startScanBtn');
+            if (startBtn) {
+                startBtn.textContent = '📸 بدء المسح';
+                startBtn.disabled = false;
+            }
+
+            console.log('✅ Scanner cleanup complete');
         }
 
-        // Add event listeners for page visibility and navigation
+        // Expose stopScanner globally so parent frame can call it
+        window.stopScanner = stopScanner;
+
+        // Add event listeners for page lifecycle
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                stopCamera();
+                console.log('📱 Page hidden, stopping scanner...');
+                stopScanner();
             }
         });
 
         window.addEventListener('beforeunload', function() {
-            stopCamera();
+            console.log('🔄 Page unloading, stopping scanner...');
+            stopScanner();
         });
 
         window.addEventListener('pagehide', function() {
-            stopCamera();
+            console.log('👋 Page hiding, stopping scanner...');
+            stopScanner();
+        });
+
+        // Listen for messages from parent frame
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'stop-scanner') {
+                console.log('📨 Received stop-scanner message from parent');
+                stopScanner();
+            }
         });
 
         function updateActionUI(repairOverride = null) {

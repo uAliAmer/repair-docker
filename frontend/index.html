@@ -834,6 +834,19 @@
 
             async handleLogout() {
                 if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                    // Stop all scanners before logout
+                    console.log('🔄 Stopping all scanners before logout...');
+                    document.querySelectorAll('.page-content iframe').forEach(iframe => {
+                        try {
+                            if (iframe.contentWindow && iframe.contentWindow.stopScanner) {
+                                iframe.contentWindow.stopScanner();
+                            }
+                            iframe.contentWindow.postMessage({ type: 'stop-scanner' }, window.location.origin);
+                        } catch (e) {
+                            console.log('Could not stop scanner in iframe:', e.message);
+                        }
+                    });
+
                     this.showLoading();
                     await api.logout();
                     this.session = null;
@@ -844,6 +857,21 @@
 
             navigateToPage(page) {
                 if (this.currentPage === page) return;
+
+                // Stop any active scanners in iframes before navigation
+                console.log('🔄 Stopping all scanners before page switch...');
+                document.querySelectorAll('.page-content iframe').forEach(iframe => {
+                    try {
+                        // Try to call stopScanner directly
+                        if (iframe.contentWindow && iframe.contentWindow.stopScanner) {
+                            iframe.contentWindow.stopScanner();
+                        }
+                        // Also send postMessage as fallback
+                        iframe.contentWindow.postMessage({ type: 'stop-scanner' }, window.location.origin);
+                    } catch (e) {
+                        console.log('Could not stop scanner in iframe:', e.message);
+                    }
+                });
 
                 // Remove active class from all links
                 document.querySelectorAll('.nav-link').forEach(link => {
